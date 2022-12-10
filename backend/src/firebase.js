@@ -1,5 +1,5 @@
 const { initializeApp } = require('firebase/app');
-const { getDatabase, ref, push, set } = require('firebase/database');
+const { getDatabase, ref, push, set, update } = require('firebase/database');
 
 const app = initializeApp({
   apiKey: 'AIzaSyCvco7fC8XnCjXGir_bY_QKXVrn7qdZglU',
@@ -16,14 +16,16 @@ const db = getDatabase(app);
 // To just create a new ID
 const uid = () => push(ref(db, '/calls')).key;
 
-module.exports.initCallData = async () => {
-  const callId = uid();
+module.exports.initCallData = (streamSid) => {
+  if (!streamSid) {
+    return
+  }
 
-  await set(
-    ref(db, `/calls/${callId}`),
+  return set(
+    ref(db, `/calls/${streamSid}`),
     // TODO: feed in data
     {
-      created: new Date().toISOString(),
+      dateCreated: new Date().toISOString(),
       emergency: 'EMERGENCY',
       geocode: {
         lat: 37.7623985,
@@ -38,14 +40,25 @@ module.exports.initCallData = async () => {
       transcript: '',
     }
   );
-
-  return callId;
 };
 
-module.exports.updateTranscript = (callID, msg) => {
-  if (!callID) {
+module.exports.updateOnDisconnect = (streamSid) => {
+  if (!streamSid) {
     return;
   }
 
-  return set(ref(db, `/calls/${callID}/transcript`), msg);
+  const updates = {
+    live: false,
+    dateDisconnected: new Date().toISOString()
+  }
+
+  return update(ref(db, `/calls/${streamSid}`), updates);
+}
+
+module.exports.updateTranscript = (streamSid, msg) => {
+  if (!streamSid) {
+    return;
+  }
+
+  return set(ref(db, `/calls/${streamSid}/transcript`), msg);
 };
