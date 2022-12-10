@@ -12,6 +12,7 @@ const server = require('http').createServer(app);
 const wss = new WebSocket.Server({ server });
 
 const { initCallData, updateTranscript, updateOnDisconnect } = require('./src/firebase');
+const { analyzePriority } = require('./src/utils');
 
 let assembly;
 let chunks = [];
@@ -33,29 +34,29 @@ wss.on('connection', (ws) => {
 
       case 'start':
         console.info('Starting media stream...');
-        console.info(`streamSid: ${msg.streamSid}`);
         console.info(`callSid: ${msg.start.callSid}`);
 
-
         callerMap[msg.streamSid] = msg.start.callSid;
+
+        const callSid = msg.start.callSid ?? callerMap[msg.streamSid];
 
         const texts = {};
 
         assembly.onerror = console.error;
         assembly.onmessage = (assemblyMsg) => {
-          let messageText = '';
+          let transcript = '';
           const res = JSON.parse(assemblyMsg.data);
           texts[res.audio_start] = res.text;
           const keys = Object.keys(texts);
           keys.sort((a, b) => a - b);
           for (const key of keys) {
             if (texts[key]) {
-              messageText += ` ${texts[key]}`;
+              transcript += ` ${texts[key]}`;
             }
           }
 
-          console.log(messageText);
-          updateTranscript(msg.start.callSid ?? callerMap[msg.streamSid], messageText);
+          const priority = analyzePriority(transcript);
+          updateTranscript(callSid, transcript, priority);
         };
         break;
 
@@ -100,7 +101,7 @@ wss.on('connection', (ws) => {
       case 'stop':
         console.info('Call has ended');
         assembly.send(JSON.stringify({ terminate_session: true }));
-        updateOnDisconnect(callerMap[msg.streamSid])
+        updateOnDisconnect(callerMap[msg.streamSid]);
         setTimeout(() => assembly.close(), 100); // time?
         break;
     }
@@ -116,7 +117,7 @@ app.post('/', async (req, res) => {
 
   assembly = new WebSocket(
     'wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000',
-    { headers: { authorization: process.env.API_KEY } }
+    { headers: { authorization: process.env.ASSEMBLYAI_API_KEY } }
   );
 
   initCallData(callSid, req.body);
@@ -128,7 +129,15 @@ app.post('/', async (req, res) => {
          <Stream url='wss://${req.headers.host}' />
        </Start>
        <Say>
-         Start speaking to see your audio transcribed in the console
+         San Francisco nine one one. What is your emergency?
+       </Say>
+       <Pause length='6' />
+       <Say>
+         What's the address of your emergency?
+       </Say>
+       <Pause length='8' />
+       <Say>
+         We will send someone as soon as we can! Please stay on the line.
        </Say>
        <Pause length='60' />
      </Response>`
@@ -136,3 +145,17 @@ app.post('/', async (req, res) => {
 });
 
 server.listen(8080, () => console.log('Listening on Port 8080'));
+
+const exitHandler = (exitCode = 0) => function() {
+  console.log('Gracefully terminating assemblyai connection')
+  if (assembly) {
+    assembly.close()
+  }
+
+  process.exit(exitCode)
+}
+
+process.on('uncaughtException', exitHandler(1))
+process.on('unhandledRejection', exitHandler(1))
+process.on('SIGTERM', exitHandler(0))
+process.on('SIGINT', exitHandler(0))

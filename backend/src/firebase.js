@@ -1,5 +1,6 @@
 const { initializeApp } = require('firebase/app');
-const { getDatabase, ref, push, set, update } = require('firebase/database');
+const { getDatabase, ref, push, set, update, runTransaction, get } = require('firebase/database');
+const { getCoordinates, analyzeTranscript } = require('./utils');
 
 const app = initializeApp({
   apiKey: 'AIzaSyCvco7fC8XnCjXGir_bY_QKXVrn7qdZglU',
@@ -13,9 +14,6 @@ const app = initializeApp({
 
 const db = getDatabase(app);
 
-// To just create a new ID
-const uid = () => push(ref(db, '/calls')).key;
-
 module.exports.initCallData = (callSid, payload) => {
   if (!callSid) {
     return
@@ -23,26 +21,22 @@ module.exports.initCallData = (callSid, payload) => {
 
   return set(
     ref(db, `/calls/${callSid}`),
-    // TODO: feed in data
     {
       dateCreated: new Date().toISOString(),
       emergency: 'EMERGENCY',
-      geocode: {
-        lat: 37.7623985,
-        lng: -122.465668,
-      },
+      // geocode: undefined,
+      // location: undefined,
       live: true,
-      location: '//TODO 320 Judah St',
       name: payload.CallerName ?? 'UNKNOWN CALLER',
       phone: payload.From ?? 'UNKNOWN NUMBER',
-      priority: 1,
+      priority: 'TBD', // HIGH | MEDIUM | LOW | TBD
       status: 'OPEN', // 'OPEN' | 'DISPATCHED' | 'RESOLVED'
       transcript: '',
     }
   );
 };
 
-module.exports.updateOnDisconnect = (callSid) => {
+module.exports.updateOnDisconnect = async (callSid) => {
   if (!callSid) {
     return;
   }
@@ -52,13 +46,44 @@ module.exports.updateOnDisconnect = (callSid) => {
     dateDisconnected: new Date().toISOString()
   }
 
+  const snapshot = await get(ref(db, `/calls/${callSid}/transcript`));
+
+  if (snapshot.exists()) {
+    const transcript = snapshot.val();
+    console.log('Final transcript: ', transcript)
+
+    const data = (await analyzeTranscript(transcript)) ?? [];
+    const sorted = data.sort(({score: scoreA}, { score: scoreB }) => scoreB - scoreA);
+
+    const location = sorted.find(({ entity_group }) => entity_group === 'LOC')?.word;
+    const name = sorted.find(({ entity_group }) => entity_group === 'PER')?.word;
+
+    if (location) {
+      console.log('Found location', location)
+      updates.location = location;
+
+      const coordinates = await getCoordinates(location)
+      if (coordinates.lat && coordinates.lng) {
+        updates.geocode = coordinates
+      }
+    }
+
+    // override because the caller has announced their name which is more accurate
+    if (name) {
+      console.log('Found name', name)
+      updates.name = name;
+    }
+  }
+
   return update(ref(db, `/calls/${callSid}`), updates);
 }
 
-module.exports.updateTranscript = (callSid, msg) => {
+module.exports.updateTranscript = (callSid, transcript, priority) => {
   if (!callSid) {
     return;
   }
 
-  return set(ref(db, `/calls/${callSid}/transcript`), msg);
+  return update(ref(db, `/calls/${callSid}`), {
+    transcript, priority
+  });
 };
