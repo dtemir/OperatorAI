@@ -16,13 +16,13 @@ const db = getDatabase(app);
 // To just create a new ID
 const uid = () => push(ref(db, '/calls')).key;
 
-module.exports.initCallData = (streamSid) => {
-  if (!streamSid) {
+module.exports.initCallData = (callSid, payload) => {
+  if (!callSid) {
     return
   }
 
   return set(
-    ref(db, `/calls/${streamSid}`),
+    ref(db, `/calls/${callSid}`),
     // TODO: feed in data
     {
       dateCreated: new Date().toISOString(),
@@ -33,17 +33,17 @@ module.exports.initCallData = (streamSid) => {
       },
       live: true,
       location: '//TODO 320 Judah St',
-      name: '//TODO NAME',
-      phone: '//TODO (000) 000-0000',
+      name: payload.CallerName ?? 'UNKNOWN CALLER',
+      phone: payload.From ?? 'UNKNOWN NUMBER',
       priority: 1,
-      status: 'STATUS',
+      status: 'OPEN', // 'OPEN' | 'DISPATCHED' | 'RESOLVED'
       transcript: '',
     }
   );
 };
 
-module.exports.updateOnDisconnect = (streamSid) => {
-  if (!streamSid) {
+module.exports.updateOnDisconnect = (callSid) => {
+  if (!callSid) {
     return;
   }
 
@@ -52,13 +52,13 @@ module.exports.updateOnDisconnect = (streamSid) => {
     dateDisconnected: new Date().toISOString()
   }
 
-  return update(ref(db, `/calls/${streamSid}`), updates);
+  return update(ref(db, `/calls/${callSid}`), updates);
 }
 
-module.exports.updateTranscript = (streamSid, msg) => {
-  if (!streamSid) {
+module.exports.updateTranscript = (callSid, msg) => {
+  if (!callSid) {
     return;
   }
 
-  return set(ref(db, `/calls/${streamSid}/transcript`), msg);
+  return set(ref(db, `/calls/${callSid}/transcript`), msg);
 };
