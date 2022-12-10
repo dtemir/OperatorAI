@@ -1,50 +1,60 @@
-const express = require("express");
+require('dotenv').config();
 
-const WebSocket = require("ws");
-const WaveFile = require("wavefile").WaveFile;
+const express = require('express');
+
+const WebSocket = require('ws');
+const WaveFile = require('wavefile').WaveFile;
 
 const app = express();
-const server = require("http").createServer(app);
+const server = require('http').createServer(app);
 const wss = new WebSocket.Server({ server });
+
+const { initCallData, updateTranscript } = require('./src/firebase');
 
 let assembly;
 let chunks = [];
 
-wss.on("connection", (ws) => {
-  console.info("New Connection Initiated");
+wss.on('connection', (ws) => {
+  console.info('New Connection Initiated');
 
-  ws.on("message", (message) => {
+  ws.on('message', async (message) => {
     if (!assembly)
       return console.error("AssemblyAI's WebSocket must be initialized.");
 
     const msg = JSON.parse(message);
 
     switch (msg.event) {
-      case "connected":
-        console.info("A new call has started.");
-        assembly.onerror = console.error;
+      case 'connected':
+        console.info('A new call has started.');
+        const callId = await initCallData();
+        console.info(`Call Id: ${callId}`);
+
         const texts = {};
+
+        assembly.onerror = console.error;
         assembly.onmessage = (assemblyMsg) => {
           let msg = '';
-      	  const res = JSON.parse(assemblyMsg.data);
-      	  texts[res.audio_start] = res.text;
-      	  const keys = Object.keys(texts);
-      	  keys.sort((a, b) => a - b);
-      	  for (const key of keys) {
+          const res = JSON.parse(assemblyMsg.data);
+          texts[res.audio_start] = res.text;
+          const keys = Object.keys(texts);
+          keys.sort((a, b) => a - b);
+          for (const key of keys) {
             if (texts[key]) {
               msg += ` ${texts[key]}`;
             }
           }
-      	  console.log(msg);
+
+          console.log(msg);
+          updateTranscript(callId, msg);
         };
 
         break;
 
-      case "start":
-        console.info("Starting media stream...");
+      case 'start':
+        console.info('Starting media stream...');
         break;
 
-      case "media":
+      case 'media':
         const twilioData = msg.media.payload;
 
         // Here are the current options explored using the WaveFile lib:
@@ -53,16 +63,16 @@ wss.on("connection", (ws) => {
         let wav = new WaveFile();
 
         // Twilio uses MuLaw so we have to encode for that
-        wav.fromScratch(1, 8000, "8m", Buffer.from(twilioData, "base64"));
+        wav.fromScratch(1, 8000, '8m', Buffer.from(twilioData, 'base64'));
 
         // This library has a handy method to decode MuLaw straight to 16-bit PCM
         wav.fromMuLaw();
 
         // Here we get the raw audio data in base64
-        const twilio64Encoded = wav.toDataURI().split("base64,")[1];
+        const twilio64Encoded = wav.toDataURI().split('base64,')[1];
 
         // Create our audio buffer
-        const twilioAudioBuffer = Buffer.from(twilio64Encoded, "base64");
+        const twilioAudioBuffer = Buffer.from(twilio64Encoded, 'base64');
 
         // We send data starting at byte 44 to remove wav headers so our model sees only audio data
         chunks.push(twilioAudioBuffer.slice(44));
@@ -73,7 +83,7 @@ wss.on("connection", (ws) => {
           const audioBuffer = Buffer.concat(chunks);
 
           // Re-encode to base64
-          const encodedAudio = audioBuffer.toString("base64");
+          const encodedAudio = audioBuffer.toString('base64');
 
           // Finally send to assembly and clear chunks
           assembly.send(JSON.stringify({ audio_data: encodedAudio }));
@@ -82,23 +92,23 @@ wss.on("connection", (ws) => {
 
         break;
 
-      case "stop":
-        console.info("Call has ended");
+      case 'stop':
+        console.info('Call has ended');
         assembly.send(JSON.stringify({ terminate_session: true }));
         break;
     }
   });
 });
 
-app.get("/", (_, res) => res.send("Twilio Live Stream App"));
+app.get('/', (_, res) => res.send('Twilio Live Stream App'));
 
-app.post("/", async (req, res) => {
+app.post('/', async (req, res) => {
   assembly = new WebSocket(
-    "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000",
-    { headers: { authorization: process.env.APIKEY } }
+    'wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000',
+    { headers: { authorization: process.env.API_KEY } }
   );
 
-  res.set("Content-Type", "text/xml");
+  res.set('Content-Type', 'text/xml');
   res.send(
     `<Response>
        <Start>
@@ -112,5 +122,4 @@ app.post("/", async (req, res) => {
   );
 });
 
-console.log("Listening on Port 8080");
-server.listen(8080);
+server.listen(8080, () => console.log('Listening on Port 8080'));
