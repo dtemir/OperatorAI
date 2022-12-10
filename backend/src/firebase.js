@@ -17,35 +17,35 @@ const db = getDatabase(app);
 const uid = () => push(ref(db, '/calls')).key;
 
 module.exports.initCallData = async () => {
-  const key = uid();
+  const callId = uid();
 
   await set(
-    ref(db, '/calls'),
+    ref(db, `/calls/${callId}`),
     // TODO: feed in data
     {
       created: new Date().toISOString(),
       emergency: 'EMERGENCY',
       geocode: {
-        lat: 31,
-        lng: -122,
+        lat: 37.7623985,
+        lng: -122.465668,
       },
       live: true,
-      location: 'LOCATION',
-      name: 'NAME',
-      phone: 'PHONE',
+      location: '//TODO 320 Judah St',
+      name: '//TODO NAME',
+      phone: '//TODO (000) 000-0000',
       priority: 1,
       status: 'STATUS',
       transcript: '',
     }
   );
 
-  return key;
+  return callId;
 };
 
-module.exports.updateTranscript = (key, msg) => {
-  if (!key) {
+module.exports.updateTranscript = (callID, msg) => {
+  if (!callID) {
     return;
   }
 
-  return set(ref(db, `/calls/${key}/transcript`), msg);
+  return set(ref(db, `/calls/${callID}/transcript`), msg);
 };

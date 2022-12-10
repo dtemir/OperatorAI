@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 
 const WebSocket = require('ws');
@@ -24,8 +26,8 @@ wss.on('connection', (ws) => {
     switch (msg.event) {
       case 'connected':
         console.info('A new call has started.');
-        const key = await initCallData();
-        console.info(`KEY=${key}`);
+        const callId = await initCallData();
+        console.info(`Call Id: ${callId}`);
 
         const texts = {};
 
@@ -43,7 +45,7 @@ wss.on('connection', (ws) => {
           }
 
           console.log(msg);
-          updateTranscript(key, msg);
+          updateTranscript(callId, msg);
         };
 
         break;
