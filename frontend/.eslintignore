@@ -2,5 +2,6 @@ node_modules
 dist
 .prettierrc.js
 .eslintrc.cjs
+tsconfig.json
 vite.config.ts
 env.d.ts
