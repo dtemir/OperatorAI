@@ -1,93 +1,119 @@
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
   Badge,
+  Box,
+  Collapse,
   Table,
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { DataSnapshot } from 'firebase/database';
-import React, { Fragment } from 'react';
-import { BsFillCircleFill } from 'react-icons/bs';
-import { CallData, PRIORITIES, STATUS_COLORS } from '../types/calls';
+import React from 'react';
+import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { CallData, PRIORITIES, STATUSES } from '../types/calls';
+import { Info } from './Info';
+import { StatusIndicator } from './StatusIndicator';
 
-const headers = ['Priority', 'Who', 'What', 'When', 'Where', 'Live', 'Status', ''];
+const headers = ['Live', 'Priority', 'Who', 'What', 'When', 'Where', 'Status', ''];
 
 interface TrProps {
+  selected: boolean;
   data: CallData;
   onClick: (data: CallData) => void;
 }
 
-const TableRow: React.FC<TrProps> = ({ data, onClick }) => {
+const TableRow: React.FC<TrProps> = ({ data, selected, onClick }) => {
+  const { isOpen, onToggle } = useDisclosure({
+    defaultIsOpen: data.live,
+  });
+
   return (
-    <AccordionItem as={Fragment}>
-      {({ isExpanded }) => (
-        <>
-          <Tr onClick={() => onClick(data)}>
-            <Td>
-              <AccordionButton>
-                <AccordionIcon />
-              </AccordionButton>
-            </Td>
-            <Td>
-              <Badge colorScheme={PRIORITIES?.[data.priority]?.color}>{PRIORITIES?.[data.priority]?.label}</Badge>
-            </Td>
-            <Td>
-              {data.name} ({data.phone})
-            </Td>
-            <Td>{data.emergency}</Td>
-            <Td>{new Date(data.created).toLocaleString()}</Td>
-            <Td>{data.location}</Td>
-            <Td>
-              <BsFillCircleFill color={data.live ? 'green' : 'red'} />
-            </Td>
-            <Td>
-              <Badge colorScheme={STATUS_COLORS[data.status]}>{data.status}</Badge>
-            </Td>
-          </Tr>
-          <Tr display={isExpanded ? 'contents' : 'none'}>
-            <Td colSpan={headers.length}>
-              <AccordionPanel>{data.transcript}</AccordionPanel>
-            </Td>
-          </Tr>
-        </>
-      )}
-    </AccordionItem>
+    <>
+      <Tr
+        cursor="pointer"
+        _hover={{
+          bg: 'blackAlpha.100',
+        }}
+        bg={selected ? 'blue.50' : 'white'}
+        onClick={() => onClick(data)}
+      >
+        <Td>
+          {' '}
+          <StatusIndicator active={data.live} />{' '}
+        </Td>
+        <Td>
+          <Badge colorScheme={PRIORITIES?.[data.priority]?.color}>{data.priority}</Badge>
+        </Td>
+        <Td>
+          {data.name} <br />({data.phone})
+        </Td>
+        <Td>{data.emergency}</Td>
+        <Td>{new Date(data.dateCreated).toLocaleTimeString()}</Td>
+        <Td>{data.location}</Td>
+        <Td>
+          <Badge colorScheme={STATUSES?.[data.status]?.color}>{data.status}</Badge>
+        </Td>
+        <Td onClick={onToggle}>
+          <Box>{isOpen ? <FiChevronUp size="20px" /> : <FiChevronDown size="20px" />}</Box>
+        </Td>
+      </Tr>
+      <Tr display={isOpen ? 'contents' : 'none'}>
+        <Td colSpan={headers.length} bg="white">
+          <Collapse in={isOpen} animateOpacity>
+            <Text as="cite">{data.transcript}</Text>
+          </Collapse>
+        </Td>
+      </Tr>
+    </>
   );
 };
 
 const CallsTable: React.FC<{
-  calls: DataSnapshot[];
+  selectedRowKey?: string | null;
+  calls: CallData[];
   onRowClick: (data: CallData) => void;
-}> = ({ calls, onRowClick }) => {
-  const openedAccordionsByDefault = calls.reduce((acc: number[], curr, i) => {
-    if ((curr.val() as CallData).live) acc.push(i);
-    return acc;
-  }, []);
+}> = ({ calls, onRowClick, selectedRowKey }) => {
+  const sortDescendingByDate = calls.sort(
+    (a, b) => new Date((b as CallData).dateCreated).getTime() - new Date((a as CallData).dateCreated).getTime()
+  );
+
+  const sortByLive = sortDescendingByDate.sort((a, b) => {
+    return Number((b as CallData).live) - Number((a as CallData).live);
+  });
+
   return (
-    <TableContainer maxW={'3xl'} border="1px solid" borderRadius="2xl" borderColor="blackAlpha.200">
-      <Table variant={'simple'} size="sm">
-        <Thead>
+    <TableContainer
+      display="flex"
+      maxH="70vh"
+      maxW={{ base: 'full', lg: 'xl', xl: '3xl', '2xl': 'unset' }}
+      overflowY="auto"
+      border="1px solid"
+      borderRadius="2xl"
+      shadow="xl"
+      borderColor="blackAlpha.200"
+    >
+      <Table size="sm">
+        <Thead position="sticky" top="0" bg="white" zIndex={1} h="4rem">
           <Tr>
-            <Th></Th>
             {headers.map((header) => (
               <Th key={header}>{header}</Th>
             ))}
           </Tr>
         </Thead>
         <Tbody>
-          <Accordion as={Fragment} allowMultiple defaultIndex={openedAccordionsByDefault}>
-            {calls.map((v) => (
-              <TableRow key={v.key} data={v.val() as CallData} onClick={onRowClick} />
-            ))}
-          </Accordion>
+          {!sortByLive.length ? (
+            <Td bg="white" colSpan={headers.length}>
+              <Info text="No Data Found" />
+            </Td>
+          ) : (
+            sortByLive.map((v) => (
+              <TableRow key={v.key} selected={selectedRowKey === v.key} data={v} onClick={onRowClick} />
+            ))
+          )}
         </Tbody>
       </Table>
     </TableContainer>
