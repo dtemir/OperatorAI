@@ -1,5 +1,5 @@
 const { initializeApp } = require('firebase/app');
-const { getDatabase, ref, push, set, update, runTransaction, get } = require('firebase/database');
+const { getDatabase, ref, set, update, get } = require('firebase/database');
 const { getCoordinates, analyzeTranscript } = require('./utils');
 
 const app = initializeApp({
@@ -16,24 +16,21 @@ const db = getDatabase(app);
 
 module.exports.initCallData = (callSid, payload) => {
   if (!callSid) {
-    return
+    return;
   }
 
-  return set(
-    ref(db, `/calls/${callSid}`),
-    {
-      dateCreated: new Date().toISOString(),
-      emergency: 'EMERGENCY',
-      // geocode: undefined,
-      // location: undefined,
-      live: true,
-      name: payload.CallerName ?? 'UNKNOWN CALLER',
-      phone: payload.From ?? 'UNKNOWN NUMBER',
-      priority: 'TBD', // HIGH | MEDIUM | LOW | TBD
-      status: 'OPEN', // 'OPEN' | 'DISPATCHED' | 'RESOLVED'
-      transcript: '',
-    }
-  );
+  return set(ref(db, `/calls/${callSid}`), {
+    dateCreated: new Date().toISOString(),
+    emergency: 'EMERGENCY',
+    // geocode: undefined,
+    // location: undefined,
+    live: true,
+    name: payload.CallerName ?? 'UNKNOWN CALLER',
+    phone: payload.From ?? 'UNKNOWN NUMBER',
+    priority: 'TBD', // HIGH | MEDIUM | LOW | TBD
+    status: 'OPEN', // 'OPEN' | 'DISPATCHED' | 'RESOLVED'
+    transcript: '',
+  });
 };
 
 module.exports.updateOnDisconnect = async (callSid) => {
@@ -43,40 +40,40 @@ module.exports.updateOnDisconnect = async (callSid) => {
 
   const updates = {
     live: false,
-    dateDisconnected: new Date().toISOString()
-  }
+    dateDisconnected: new Date().toISOString(),
+  };
 
   const snapshot = await get(ref(db, `/calls/${callSid}/transcript`));
 
   if (snapshot.exists()) {
     const transcript = snapshot.val();
-    console.log('Final transcript: ', transcript)
+    console.log('Final transcript: ', transcript);
 
     const data = (await analyzeTranscript(transcript)) ?? [];
-    const sorted = data.sort(({score: scoreA}, { score: scoreB }) => scoreB - scoreA);
+    const sorted = data.sort(({ score: scoreA }, { score: scoreB }) => scoreB - scoreA);
 
     const location = sorted.find(({ entity_group }) => entity_group === 'LOC')?.word;
     const name = sorted.find(({ entity_group }) => entity_group === 'PER')?.word;
 
     if (location) {
-      console.log('Found location', location)
+      console.log('Found location', location);
       updates.location = location;
 
-      const coordinates = await getCoordinates(location)
+      const coordinates = await getCoordinates(location);
       if (coordinates.lat && coordinates.lng) {
-        updates.geocode = coordinates
+        updates.geocode = coordinates;
       }
     }
 
     // override because the caller has announced their name which is more accurate
     if (name) {
-      console.log('Found name', name)
+      console.log('Found name', name);
       updates.name = name;
     }
   }
 
   return update(ref(db, `/calls/${callSid}`), updates);
-}
+};
 
 module.exports.updateTranscript = (callSid, transcript, priority) => {
   if (!callSid) {
@@ -84,6 +81,7 @@ module.exports.updateTranscript = (callSid, transcript, priority) => {
   }
 
   return update(ref(db, `/calls/${callSid}`), {
-    transcript, priority
+    transcript,
+    priority,
   });
 };

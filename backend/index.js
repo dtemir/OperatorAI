@@ -22,8 +22,7 @@ wss.on('connection', (ws) => {
   console.info('New Connection Initiated');
 
   ws.on('message', async (message) => {
-    if (!assembly)
-      return console.error("AssemblyAI's WebSocket must be initialized.");
+    if (!assembly) return console.error("AssemblyAI's WebSocket must be initialized.");
 
     const msg = JSON.parse(message);
 
@@ -105,7 +104,7 @@ wss.on('connection', (ws) => {
         setTimeout(() => assembly.close(), 100); // time?
         break;
     }
-  })
+  });
 });
 
 app.get('/', (_, res) => res.send('Twilio Live Stream App'));
@@ -115,10 +114,9 @@ app.post('/', async (req, res) => {
 
   console.log('Webhook received');
 
-  assembly = new WebSocket(
-    'wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000',
-    { headers: { authorization: process.env.ASSEMBLYAI_API_KEY } }
-  );
+  assembly = new WebSocket('wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000', {
+    headers: { authorization: process.env.ASSEMBLYAI_API_KEY },
+  });
 
   initCallData(callSid, req.body);
 
@@ -146,16 +144,17 @@ app.post('/', async (req, res) => {
 
 server.listen(8080, () => console.log('Listening on Port 8080'));
 
-const exitHandler = (exitCode = 0) => function() {
-  console.log('Gracefully terminating assemblyai connection')
-  if (assembly) {
-    assembly.close()
-  }
+const exitHandler = (exitCode = 0) =>
+  function () {
+    console.log('Gracefully terminating assemblyai connection');
+    if (assembly) {
+      assembly.close();
+    }
 
-  process.exit(exitCode)
-}
+    process.exit(exitCode);
+  };
 
-process.on('uncaughtException', exitHandler(1))
-process.on('unhandledRejection', exitHandler(1))
-process.on('SIGTERM', exitHandler(0))
-process.on('SIGINT', exitHandler(0))
+process.on('uncaughtException', exitHandler(1));
+process.on('unhandledRejection', exitHandler(1));
+process.on('SIGTERM', exitHandler(0));
+process.on('SIGINT', exitHandler(0));

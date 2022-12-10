@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "pretty": "prettier --write \"./**/*.{js,json}\""
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +15,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "firebase": "^9.15.0",
+    "prettier": "^2.8.1",
     "wavefile": "^11.0.0",
     "ws": "^8.11.0"
   }
