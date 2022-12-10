@@ -9,7 +9,7 @@ const app = express();
 const server = require('http').createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const { initCallData, updateTranscript } = require('./src/firebase');
+const { initCallData, updateTranscript, updateOnDisconnect } = require('./src/firebase');
 
 let assembly;
 let chunks = [];
@@ -25,33 +25,33 @@ wss.on('connection', (ws) => {
 
     switch (msg.event) {
       case 'connected':
-        console.info('A new call has started.');
-        const callId = await initCallData();
-        console.info(`Call Id: ${callId}`);
+        console.info('A new call has been connected.');
+        break;
+
+      case 'start':
+        console.info('Starting media stream...');
+
+        console.info(`streamSid: ${msg.streamSid}`);
+        initCallData(msg.streamSid);
 
         const texts = {};
 
         assembly.onerror = console.error;
         assembly.onmessage = (assemblyMsg) => {
-          let msg = '';
+          let messageText = '';
           const res = JSON.parse(assemblyMsg.data);
           texts[res.audio_start] = res.text;
           const keys = Object.keys(texts);
           keys.sort((a, b) => a - b);
           for (const key of keys) {
             if (texts[key]) {
-              msg += ` ${texts[key]}`;
+              messageText += ` ${texts[key]}`;
             }
           }
 
-          console.log(msg);
-          updateTranscript(callId, msg);
+          console.log(messageText);
+          updateTranscript(msg.streamSid, messageText);
         };
-
-        break;
-
-      case 'start':
-        console.info('Starting media stream...');
         break;
 
       case 'media':
@@ -95,6 +95,7 @@ wss.on('connection', (ws) => {
       case 'stop':
         console.info('Call has ended');
         assembly.send(JSON.stringify({ terminate_session: true }));
+        updateOnDisconnect(msg.streamSid)
         break;
     }
   });
@@ -103,6 +104,8 @@ wss.on('connection', (ws) => {
 app.get('/', (_, res) => res.send('Twilio Live Stream App'));
 
 app.post('/', async (req, res) => {
+  console.log('Webhook received');
+
   assembly = new WebSocket(
     'wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000',
     { headers: { authorization: process.env.API_KEY } }
