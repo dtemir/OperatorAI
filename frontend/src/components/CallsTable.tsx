@@ -72,8 +72,8 @@ const CallsTable: React.FC<{
     return acc;
   }, []);
   return (
-    <TableContainer>
-      <Table variant={'simple'}>
+    <TableContainer maxW={'3xl'} border="1px solid" borderRadius="2xl" borderColor="blackAlpha.200">
+      <Table variant={'simple'} size="sm">
         <Thead>
           <Tr>
             <Th></Th>
