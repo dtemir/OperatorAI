@@ -1,11 +1,13 @@
 require('dotenv').config();
 
 const express = require('express');
+const bodyParser = require('body-parser');
 
 const WebSocket = require('ws');
 const WaveFile = require('wavefile').WaveFile;
 
 const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
 const server = require('http').createServer(app);
 const wss = new WebSocket.Server({ server });
 
@@ -13,6 +15,7 @@ const { initCallData, updateTranscript, updateOnDisconnect } = require('./src/fi
 
 let assembly;
 let chunks = [];
+let callerMap = {}; //[msg.streamSid] = msg.callSid;
 
 wss.on('connection', (ws) => {
   console.info('New Connection Initiated');
@@ -30,9 +33,11 @@ wss.on('connection', (ws) => {
 
       case 'start':
         console.info('Starting media stream...');
-
         console.info(`streamSid: ${msg.streamSid}`);
-        initCallData(msg.streamSid);
+        console.info(`callSid: ${msg.start.callSid}`);
+
+
+        callerMap[msg.streamSid] = msg.start.callSid;
 
         const texts = {};
 
@@ -50,7 +55,7 @@ wss.on('connection', (ws) => {
           }
 
           console.log(messageText);
-          updateTranscript(msg.streamSid, messageText);
+          updateTranscript(msg.start.callSid ?? callerMap[msg.streamSid], messageText);
         };
         break;
 
@@ -95,21 +100,26 @@ wss.on('connection', (ws) => {
       case 'stop':
         console.info('Call has ended');
         assembly.send(JSON.stringify({ terminate_session: true }));
-        updateOnDisconnect(msg.streamSid)
+        updateOnDisconnect(callerMap[msg.streamSid])
+        setTimeout(() => assembly.close(), 100); // time?
         break;
     }
-  });
+  })
 });
 
 app.get('/', (_, res) => res.send('Twilio Live Stream App'));
 
 app.post('/', async (req, res) => {
+  const callSid = req.body.CallSid;
+
   console.log('Webhook received');
 
   assembly = new WebSocket(
     'wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000',
     { headers: { authorization: process.env.API_KEY } }
   );
+
+  initCallData(callSid, req.body);
 
   res.set('Content-Type', 'text/xml');
   res.send(
