@@ -13,7 +13,6 @@ export const Map: React.FC<React.PropsWithChildren<MapProps>> = ({ onClick, chil
 
   useEffect(() => {
     if (ref.current && !map) {
-      console.log(new window.google.maps.Map(ref.current, {}));
       setMap(new window.google.maps.Map(ref.current, {}));
     }
   }, [ref, map]);

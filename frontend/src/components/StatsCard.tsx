@@ -1,30 +1,40 @@
-import { Box, Flex, Stat, StatLabel, StatNumber, StatProps, useColorModeValue } from '@chakra-ui/react';
+import { Box, Flex, Stat, StatLabel, StatNumber, StatProps } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 
 interface StatsCardProps extends StatProps {
   title: string;
   stat: string;
   icon: ReactNode;
+  active: boolean;
 }
+
 export const StatsCard = (props: StatsCardProps) => {
-  const { title, stat, icon, ...rest } = props;
+  const { title, stat, icon, bg, active, ...rest } = props;
   return (
     <Stat
+      cursor="pointer"
       px={{ base: 2, md: 4 }}
-      py={'8'}
-      borderColor={useColorModeValue('gray.800', 'gray.500')}
+      py={'4'}
       rounded={'2xl'}
+      bg="white"
+      shadow={active ? 'xl' : 'md'}
       {...rest}
     >
       <Flex justifyContent={'space-between'}>
         <Box pl={{ base: 2, md: 4 }}>
-          <StatLabel fontWeight={'medium'}>{title}</StatLabel>
-          <StatNumber fontSize={'2xl'} fontWeight={'medium'}>
-            {stat}
-          </StatNumber>
-        </Box>
-        <Box my={'auto'} color={useColorModeValue('gray.800', 'gray.200')} alignContent={'center'}>
-          {icon}
+          <Flex alignItems="start" gap={2}>
+            <Box bg={bg} p="1" borderRadius="md" alignContent={'center'}>
+              {icon}
+            </Box>
+            <Box>
+              <StatLabel fontWeight={'medium'} color="gray.400">
+                {title}
+              </StatLabel>
+              <StatNumber fontSize={'2xl'} fontWeight={'bold'}>
+                {stat}
+              </StatNumber>
+            </Box>
+          </Flex>
         </Box>
       </Flex>
     </Stat>
