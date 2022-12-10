@@ -14,13 +14,17 @@
     "@chakra-ui/react": "^2.4.3",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@googlemaps/react-wrapper": "^1.1.35",
     "firebase": "^9.15.0",
     "framer-motion": "^6.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-firebase-hooks": "^5.1.1"
+    "react-firebase-hooks": "^5.1.1",
+    "react-icons": "^4.7.1",
+    "use-deep-compare-effect": "^1.8.1"
   },
   "devDependencies": {
+    "@types/google.maps": "^3.51.0",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",
     "@typescript-eslint/eslint-plugin": "^5.46.0",

@@ -10,7 +10,6 @@ module.exports = {
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -19,7 +18,8 @@ module.exports = {
     },
     ecmaVersion: 2021,
     sourceType: 'module',
-    project: './tsconfig.json',
+    project: 'tsconfig.eslint.json',
+    tsconfigRootDir: __dirname,
   },
   plugins: ['react', '@typescript-eslint'],
   rules: {
