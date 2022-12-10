@@ -7,7 +7,7 @@ const app = express();
 const server = require('http').createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const { createCallData } = require('./src/firebase');
+const { initCallData, updateTranscript } = require('./src/firebase');
 
 let assembly;
 let chunks = [];
@@ -15,7 +15,7 @@ let chunks = [];
 wss.on('connection', (ws) => {
   console.info('New Connection Initiated');
 
-  ws.on('message', (message) => {
+  ws.on('message', async (message) => {
     if (!assembly)
       return console.error("AssemblyAI's WebSocket must be initialized.");
 
@@ -24,8 +24,12 @@ wss.on('connection', (ws) => {
     switch (msg.event) {
       case 'connected':
         console.info('A new call has started.');
-        assembly.onerror = console.error;
+        const key = await initCallData();
+        console.info(`KEY=${key}`);
+
         const texts = {};
+
+        assembly.onerror = console.error;
         assembly.onmessage = (assemblyMsg) => {
           let msg = '';
           const res = JSON.parse(assemblyMsg.data);
@@ -37,7 +41,9 @@ wss.on('connection', (ws) => {
               msg += ` ${texts[key]}`;
             }
           }
+
           console.log(msg);
+          updateTranscript(key, msg);
         };
 
         break;
@@ -112,12 +118,6 @@ app.post('/', async (req, res) => {
        <Pause length='60' />
      </Response>`
   );
-});
-
-// TODO: remove
-app.post('/test', async (req, res) => {
-  const data = await createCallData();
-  res.status(200).json(data.toJSON());
 });
 
 server.listen(8080, () => console.log('Listening on Port 8080'));
