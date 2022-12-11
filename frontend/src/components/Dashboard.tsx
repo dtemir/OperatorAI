@@ -1,4 +1,4 @@
-import { SimpleGrid, Text, chakra, Box, Badge } from '@chakra-ui/react';
+import { SimpleGrid, Text, Box, Skeleton, Flex } from '@chakra-ui/react';
 
 import { AiOutlinePhone, AiOutlineClockCircle, AiOutlineFolderOpen } from 'react-icons/ai';
 import { useState } from 'react';
@@ -29,7 +29,7 @@ export const Dashboard = ({
   loading,
   error,
 }: {
-  calls: CallData[];
+  calls: CallData[] | undefined;
   loading: boolean;
   error: Error | undefined;
 }) => {
@@ -44,10 +44,28 @@ export const Dashboard = ({
     return <h1>{status}</h1>;
   };
 
+  if (!calls || loading)
+    return (
+      <Box mx="auto" maxW="4xl">
+        <Flex justifyContent="space-between">
+          <Skeleton w="200px" h="100px" />
+          <Skeleton w="200px" h="100px" />
+          <Skeleton w="200px" h="100px" />
+          <Skeleton w="200px" h="100px" />
+        </Flex>
+        <Flex flexDirection="column" gap="10px" pt="10">
+          <Skeleton pt="20px" w="full" h="30px" />
+          <Skeleton pt="20px" w="full" h="30px" />
+          <Skeleton pt="20px" w="full" h="30px" />
+          <Skeleton pt="20px" w="full" h="30px" />
+          <Skeleton pt="20px" w="full" h="30px" />
+        </Flex>
+      </Box>
+    );
+
   const dispatched = calls.filter((call) => call.status === STATUSES.DISPATCHED.key);
   const resolved = calls.filter((call) => call.status === STATUSES.RESOLVED.key);
 
-  console.log(calls);
   const filteredCalls = filterCallsBasedOnStatus(calls, status);
 
   return (
@@ -55,7 +73,7 @@ export const Dashboard = ({
       <Box w={'full'} mb={8}>
         <Box>
           {error ? <Text>Error: {error.message}</Text> : null}
-          <SimpleGrid py="8" columns={{ base: 1, md: 4 }} spacing={{ base: 5, lg: 8 }}>
+          <SimpleGrid py="8" columns={{ base: 1, lg: 4 }} spacing={{ base: 5, lg: 8 }}>
             <StatsCard
               active={!status}
               bg="gray.100"
