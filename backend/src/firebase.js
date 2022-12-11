@@ -1,6 +1,6 @@
 const { initializeApp } = require('firebase/app');
 const { getDatabase, ref, set, update, get } = require('firebase/database');
-const { getCoordinates, analyzeTranscript } = require('./utils');
+const { getCoordinates, analyzeTranscript, getNamedEntities } = require('./utils');
 
 const app = initializeApp({
   apiKey: 'AIzaSyCvco7fC8XnCjXGir_bY_QKXVrn7qdZglU',
@@ -21,7 +21,7 @@ module.exports.initCallData = (callSid, payload) => {
 
   return set(ref(db, `/calls/${callSid}`), {
     dateCreated: new Date().toISOString(),
-    emergency: 'TBD',
+    emergency: '',
     // geocode: undefined,
     // location: undefined,
     live: true,
@@ -32,6 +32,27 @@ module.exports.initCallData = (callSid, payload) => {
     transcript: '',
   });
 };
+
+const updateNamedEntitiesWithExpensiveModel = (transcript, callSid) =>
+  getNamedEntities(transcript, true).then(async ({ name, location }) => {
+    const updates = {};
+    if (name) {
+      console.log('[Expensive Model] Found name:\t', name);
+      updates.name = name;
+    }
+
+    if (location) {
+      console.log('[Expensive Model] Found location:\t', location);
+      updates.location = location;
+
+      const coordinates = await getCoordinates(location);
+      if (coordinates.lat && coordinates.lng) {
+        updates.geocode = coordinates;
+      }
+    }
+
+    return update(ref(db, `/calls/${callSid}`), updates);
+  });
 
 module.exports.updateOnDisconnect = async (callSid) => {
   if (!callSid) {
@@ -53,12 +74,12 @@ module.exports.updateOnDisconnect = async (callSid) => {
       return;
     }
 
-    console.log('Final transcript: ', transcript);
+    console.log('Final transcript:\t', transcript);
 
     const { name, location, emergencyType } = await analyzeTranscript(transcript);
 
     if (location) {
-      console.log('Found location: ', location);
+      console.log('Found location:\t', location);
       updates.location = location;
 
       const coordinates = await getCoordinates(location);
@@ -69,14 +90,17 @@ module.exports.updateOnDisconnect = async (callSid) => {
 
     // override because the caller has announced their name which is more accurate
     if (name) {
-      console.log('Found name: ', name);
+      console.log('Found name:\t', name);
       updates.name = name;
     }
 
     if (emergencyType) {
-      console.log('Found emergencyType: ', emergencyType);
+      console.log('Found emergencyType:\t', emergencyType);
       updates.emergency = emergencyType;
     }
+
+    // Whenever this resolves => override previous model's result
+    updateNamedEntitiesWithExpensiveModel(transcript, callSid);
   }
 
   return update(ref(db, `/calls/${callSid}`), updates);

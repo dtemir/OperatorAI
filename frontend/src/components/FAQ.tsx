@@ -31,8 +31,8 @@ export function FAQ() {
       a: `No, the OperatorAI system is not designed to provide medical advice or assistance. Its primary purpose is to gather information about the emergency situation and prioritize the call for a 911 operator. It is not a substitute for professional medical care.`,
     },
     {
-      q: `* For testing purposes only. Please call official 911 Emergency Services if you are in danger.`,
-      a: 'OperatorAI is a proof of concept project and is not intended to replace real emergency services.',
+      q: `* Should we use this instead of 911?`,
+      a: 'NO! OperatorAI is for testing purposes only. OperatorAI is a proof of concept project and is not intended to replace real emergency services. Please call official 911 Emergency Services if you are in danger.',
     },
   ];
 

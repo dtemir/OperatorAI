@@ -18,6 +18,7 @@ import {
   Flex,
   Button,
   Image,
+  Link,
 } from '@chakra-ui/react';
 import React from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
@@ -59,7 +60,7 @@ const TableRow: React.FC<TrProps> = ({ data, selected, onClick }) => {
         bg={selected ? 'blue.50' : 'white'}
         onClick={() => onClick(data)}
       >
-        <Td>
+        <Td textAlign="left" w="30px" pl="5">
           <Badge colorScheme={PRIORITIES?.[data.priority]?.color}>{data.priority}</Badge>
         </Td>
         <Td>
@@ -72,14 +73,14 @@ const TableRow: React.FC<TrProps> = ({ data, selected, onClick }) => {
               <br />
               <em>{formattedPhone}</em>
             </Box>
-            <Button size="sm" color="green.600">
-              Join
+            <Button size="sm" color="green.600" as={Link} href={`tel:${data.phone}`}>
+              {data.live ? 'Join' : 'Dial'}
             </Button>
           </Flex>
         </Td>
-        <Td>{data.emergency}</Td>
+        <Td>{data.emergency || '-'}</Td>
         <Td>{new Date(data.dateCreated).toLocaleTimeString()}</Td>
-        <Td>{data.location}</Td>
+        <Td>{data.location || '-'}</Td>
         <Td>
           <Badge colorScheme={STATUSES?.[data.status]?.color}>{data.status}</Badge>
         </Td>
@@ -171,7 +172,7 @@ const TableRow: React.FC<TrProps> = ({ data, selected, onClick }) => {
                     value={data.emergency}
                     onInput={(e) => updateField(data.callSid, 'emergency', e.currentTarget.value)}
                   >
-                    <option value={''}>-- Select Emergency --</option>
+                    <option value={''}>Assign</option>
                     {Object.entries(EMERGENCIES).map(([, { key: statusKey, display }]) => {
                       return (
                         <option key={statusKey} value={statusKey}>
@@ -206,7 +207,7 @@ const CallsTable: React.FC<{
   return (
     <TableContainer
       display="flex"
-      maxH="70vh"
+      maxH="90vh"
       overflowY="auto"
       border="1px solid"
       borderRadius="2xl"
