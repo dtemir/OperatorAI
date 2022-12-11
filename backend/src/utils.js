@@ -21,12 +21,23 @@ module.exports.getCoordinates = async (location) => {
   }
 };
 
-const getNamedEntities = async (transcript, options) => {
+const getNamedEntities = async (transcript, useExpensiveModel = false) => {
+  const model = useExpensiveModel
+    ? 'Jean-Baptiste/roberta-large-ner-english'
+    : 'dbmdz/bert-large-cased-finetuned-conll03-english';
+
+  if (useExpensiveModel) {
+    console.info('Using expensive model...');
+  }
+
   try {
     const { data } = await axios.post(
-      'https://api-inference.huggingface.co/models/Jean-Baptiste/roberta-large-ner-english',
+      `https://api-inference.huggingface.co/models/${model}`,
       {
         inputs: transcript,
+        options: {
+          wait_for_model: useExpensiveModel,
+        },
       },
       {
         headers: {
@@ -36,7 +47,7 @@ const getNamedEntities = async (transcript, options) => {
     );
 
     if (data?.error) {
-      console.log('ERROR 1', data);
+      console.log('request resolved with error', data);
 
       return {
         name: undefined,
@@ -59,7 +70,7 @@ const getNamedEntities = async (transcript, options) => {
   }
 };
 
-const getEmergencyType = async (transcript, options) => {
+const getEmergencyType = async (transcript) => {
   try {
     const { data } = await axios.post(
       'https://api-inference.huggingface.co/models/facebook/bart-large-mnli',
@@ -83,7 +94,7 @@ const getEmergencyType = async (transcript, options) => {
     );
 
     if (!data || !data?.labels || !data.labels.length) {
-      console.log('Error finding emergency type', data);
+      console.log('request resolved with missing data', data);
 
       return {
         emergencyType: undefined,
@@ -94,7 +105,7 @@ const getEmergencyType = async (transcript, options) => {
       emergencyType: data.labels[0].replace(/\b[a-z]/gi, (c) => c.toUpperCase()),
     };
   } catch (error) {
-    console.error('ERROR HERE', error);
+    console.error('Error finding emergency type', error);
 
     return {
       emergencyType: undefined,
@@ -104,8 +115,10 @@ const getEmergencyType = async (transcript, options) => {
 
 module.exports.analyzeTranscript = async (transcript) => {
   try {
-    const { name, location } = await getNamedEntities(transcript);
-    const { emergencyType } = await getEmergencyType(transcript);
+    const strippedTranscript = transcript.replace(/[A-Z.]/g, char => char.toLowerCase()).replace(/\./g, "");
+
+    const { name, location } = await getNamedEntities(strippedTranscript);
+    const { emergencyType } = await getEmergencyType(strippedTranscript);
 
     return {
       name,
@@ -115,6 +128,11 @@ module.exports.analyzeTranscript = async (transcript) => {
   } catch (error) {
     console.error(error);
   }
+};
+
+module.exports.getNamedEntities = (transcript, useExpensiveModel = false) => {
+  const strippedTranscript = transcript.replace(/[A-Z.]/g, char => char.toLowerCase()).replace(/\./g, "");
+  return getNamedEntities(strippedTranscript, useExpensiveModel);
 };
 
 module.exports.analyzePriority = (transcript) => {

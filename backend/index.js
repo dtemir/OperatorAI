@@ -25,7 +25,7 @@ wss.on('connection', (ws) => {
     const msg = JSON.parse(message);
     const callSid = msg.start?.callSid ?? callerMap[msg.streamSid];
 
-    const assembly = assemblyAIWSMap[callSid]
+    const assembly = assemblyAIWSMap[callSid];
     // if (!assembly) return console.error("AssemblyAI's WebSocket must be initialized.");
 
     switch (msg.event) {
@@ -101,8 +101,8 @@ wss.on('connection', (ws) => {
         assembly.send(JSON.stringify({ terminate_session: true }));
         updateOnDisconnect(callerMap[msg.streamSid]);
         setTimeout(() => {
-          assembly.close()
-          delete assemblyAIWSMap[callSid]
+          assembly.close();
+          delete assemblyAIWSMap[callSid];
         }, 100); // time?
         break;
     }
@@ -130,15 +130,9 @@ app.post('/', async (req, res) => {
          <Stream url='wss://${req.headers.host}' />
        </Start>
        <Say>
-         San Francisco nine one one. What is your emergency?
-       </Say>
-       <Pause length='6' />
-       <Say>
-         What's the address of your emergency?
-       </Say>
-       <Pause length='8' />
-       <Say>
-         We will send someone as soon as we can! Please stay on the line.
+        Thank you for calling 911. All operators are currently busy.
+        Your call will be answered by an AI assistant trained to help in emergency situations.
+        Please remain on the line and provide your name, location and the nature of your emergency so that we can assist you.
        </Say>
        <Pause length='60' />
      </Response>`
@@ -151,7 +145,7 @@ const exitHandler = (exitCode = 0) =>
   function () {
     console.log('Gracefully terminating assemblyai connection', arguments);
 
-    for (const assembly of Object.values(assemblyAIWSMap)){
+    for (const assembly of Object.values(assemblyAIWSMap)) {
       if (assembly) {
         assembly.send(JSON.stringify({ terminate_session: true }));
         assembly.close();
