@@ -69,7 +69,7 @@ export const Dashboard = ({
   const filteredCalls = filterCallsBasedOnStatus(calls, status);
 
   return (
-    <Box p={{ md: 8 }} w={{ md: '75vw' }} minH={'100vh'} mx={'auto'}>
+    <Box id="dashboard" p={{ md: 8 }} w={{ md: '75vw' }} minH={'100vh'} mx={'auto'}>
       <Box w={'full'} mb={8}>
         <Box>
           <chakra.h1 textAlign={'left'} fontSize={'4xl'} pt={10} fontWeight={'bold'}>
@@ -79,7 +79,7 @@ export const Dashboard = ({
             </Badge>
           </chakra.h1>
           {error ? <Text>Error: {error.message}</Text> : null}
-          <SimpleGrid py="8" columns={{ base: 1, lg: 4 }} spacing={{ base: 5, lg: 8 }}>
+          <SimpleGrid py="8" columns={{ base: 2, lg: 4 }} spacing={{ base: 5, lg: 8 }}>
             <StatsCard
               active={!status}
               bg="gray.100"
