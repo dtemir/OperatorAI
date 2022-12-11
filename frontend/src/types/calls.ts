@@ -6,7 +6,7 @@ export const STATUSES: Record<StatusesKeys, { key: StatusesKeys; color: string }
   },
   DISPATCHED: {
     key: 'DISPATCHED',
-    color: 'yellow',
+    color: 'orange',
   },
   RESOLVED: {
     key: 'RESOLVED',

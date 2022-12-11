@@ -111,9 +111,11 @@ const CallsTable: React.FC<{
         </Thead>
         <Tbody>
           {!sortByLive.length ? (
-            <Td bg="white" colSpan={headers.length}>
-              <Info text="No Data Found" />
-            </Td>
+            <Tr>
+              <Td bg="white" colSpan={headers.length}>
+                <Info text="No Data Found" />
+              </Td>
+            </Tr>
           ) : (
             sortByLive.map((v) => (
               <TableRow key={v.key} selected={selectedRowKey === v.key} data={v} onClick={onRowClick} />

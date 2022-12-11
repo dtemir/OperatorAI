@@ -1,6 +1,6 @@
-import { SimpleGrid, Text, chakra, Box, Flex, Badge, VStack } from '@chakra-ui/react';
+import { SimpleGrid, Text, chakra, Box, Badge } from '@chakra-ui/react';
 
-import { AiOutlinePhone, AiOutlineClockCircle } from 'react-icons/ai';
+import { AiOutlinePhone, AiOutlineClockCircle, AiOutlineFolderOpen } from 'react-icons/ai';
 import { useState } from 'react';
 import { Wrapper, Status } from '@googlemaps/react-wrapper';
 import { BsCheck2Circle } from 'react-icons/bs';
@@ -11,6 +11,19 @@ import { Marker } from './Maps/Marker';
 import CallsTable from './CallsTable';
 import { FAQ } from './FAQ';
 
+const filterCallsBasedOnStatus = (calls: CallData[], status: keyof typeof STATUSES | undefined) => {
+  switch (status) {
+    case STATUSES.OPEN.key:
+      return calls.filter((call) => call.status === STATUSES.OPEN.key);
+    case STATUSES.DISPATCHED.key:
+      return calls.filter((call) => call.status === STATUSES.DISPATCHED.key);
+    case STATUSES.RESOLVED.key:
+      return calls.filter((call) => call.status === STATUSES.RESOLVED.key);
+    default:
+      return calls;
+  }
+};
+
 export const Dashboard = ({
   calls,
   loading,
@@ -20,7 +33,7 @@ export const Dashboard = ({
   loading: boolean;
   error: Error | undefined;
 }) => {
-  const [tableView, setTableView] = useState<keyof typeof STATUSES>();
+  const [status, setStatus] = useState<keyof typeof STATUSES>();
   const [selectedRow, setSelectedRow] = useState<CallData>();
 
   const handleClick = async (call: CallData) => {
@@ -34,8 +47,8 @@ export const Dashboard = ({
   const dispatched = calls.filter((call) => call.status === STATUSES.DISPATCHED.key);
   const resolved = calls.filter((call) => call.status === STATUSES.RESOLVED.key);
 
-  const filteredCalls =
-    tableView === STATUSES.DISPATCHED.key ? dispatched : tableView === STATUSES.RESOLVED.key ? resolved : calls;
+  console.log(calls);
+  const filteredCalls = filterCallsBasedOnStatus(calls, status);
 
   return (
     <Box p={{ md: 8 }} w={{ md: '75vw' }} minH={'100vh'} mx={'auto'}>
@@ -48,30 +61,38 @@ export const Dashboard = ({
             </Badge>
           </chakra.h1>
           {error ? <Text>Error: {error.message}</Text> : null}
-          <SimpleGrid py="8" columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
+          <SimpleGrid py="8" columns={{ base: 1, md: 4 }} spacing={{ base: 5, lg: 8 }}>
             <StatsCard
-              active={!tableView}
-              bg="cyan.100"
+              active={!status}
+              bg="gray.100"
               title={'Calls'}
               stat={calls.length.toString()}
-              icon={<AiOutlinePhone color="blue" size={'1em'} />}
-              onClick={() => setTableView(undefined)}
+              icon={<AiOutlinePhone color="gray" size={'1em'} />}
+              onClick={() => setStatus(undefined)}
             />
             <StatsCard
-              active={tableView === STATUSES.DISPATCHED.key}
-              bg="red.100"
+              active={status === STATUSES.OPEN.key}
+              bg="cyan.100"
+              title={'Open'}
+              stat={calls.length.toString()}
+              icon={<AiOutlineFolderOpen color="#00A3C4" size={'1em'} />}
+              onClick={() => setStatus(STATUSES.OPEN.key)}
+            />
+            <StatsCard
+              active={status === STATUSES.DISPATCHED.key}
+              bg={`orange.100`}
               title={'Dispatched'}
               stat={dispatched.length.toString()}
-              icon={<AiOutlineClockCircle color="red" size={'1em'} />}
-              onClick={() => setTableView(STATUSES.DISPATCHED.key)}
+              icon={<AiOutlineClockCircle color="#B7791F" size={'1em'} />}
+              onClick={() => setStatus(STATUSES.DISPATCHED.key)}
             />
             <StatsCard
-              active={tableView === STATUSES.RESOLVED.key}
-              bg="green.100"
+              active={status === STATUSES.RESOLVED.key}
+              bg={`${STATUSES.RESOLVED.color}.100`}
               title={'Resolved'}
               stat={resolved.length.toString()}
-              icon={<BsCheck2Circle color="green" size={'1em'} />}
-              onClick={() => setTableView(STATUSES.RESOLVED.key)}
+              icon={<BsCheck2Circle color={STATUSES.RESOLVED.color} size={'1em'} />}
+              onClick={() => setStatus(STATUSES.RESOLVED.key)}
             />
           </SimpleGrid>
         </Box>
