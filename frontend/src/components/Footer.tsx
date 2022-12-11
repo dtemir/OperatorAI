@@ -64,7 +64,7 @@ export function Footer() {
           <SocialButton label={'OperatorAI'} href={'https://www.operatorai.tech/'}>
             <BsGlobe />
           </SocialButton>
-          <SocialButton label={'Github'} href={'https://github.com/dtemir/assembly-ai-hackathon'}>
+          <SocialButton label={'Github'} href={'https://github.com/dtemir/OperatorAI'}>
             <FaGithub />
           </SocialButton>
           <SocialButton label={'Devpost'} href={'https://devpost.com/software/draft-w86vkc'}>
