@@ -21,7 +21,7 @@ module.exports.initCallData = (callSid, payload) => {
 
   return set(ref(db, `/calls/${callSid}`), {
     dateCreated: new Date().toISOString(),
-    emergency: 'TBD',
+    emergency: '',
     // geocode: undefined,
     // location: undefined,
     live: true,
@@ -40,7 +40,7 @@ const updateNamedEntitiesWithExpensiveModel = (transcript, callSid) =>
       console.log('[Expensive Model] Found name:\t', name);
       updates.name = name;
     }
-    
+
     if (location) {
       console.log('[Expensive Model] Found location:\t', location);
       updates.location = location;

@@ -48,13 +48,14 @@ export function Footer() {
             Alpha
           </Badge>
         </chakra.h1>
-        <Text>
+        <Text align={'center'}>
           Project Submission to&nbsp;
           <Link
             target="_blank"
             rel="noopener noreferrer"
             textDecoration="underline"
             href="https://hackathon.assemblyai.com/"
+            display="inline-block"
           >
             AssemblyAI $50K AI Hackathon
           </Link>

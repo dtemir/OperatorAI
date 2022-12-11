@@ -11,71 +11,118 @@ import {
   Badge,
   Link,
   Image,
+  Flex,
   chakra,
 } from '@chakra-ui/react';
 import { BsFillTelephoneFill } from 'react-icons/bs';
 
 export const Landing = () => {
   return (
-    <Container maxW={'3xl'}>
-      <Stack as={Box} textAlign={'center'} spacing={{ base: 8, md: 14 }} pt={{ base: 16, md: 24 }} pb={{ base: 10 }}>
-        <Heading fontWeight={600} fontSize={{ base: '4xl', md: '6xl' }}>
-          OperatorAI
-          <Badge ml={2} mt={-12} fontSize="0.3em" colorScheme="purple">
-            Alpha
-          </Badge>
-        </Heading>
-        <Text color={'gray.500'}>
-          Call our OperatorAI Emergency Services
-          <chakra.a
-            onClick={() => document.querySelector('#faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-          >
-            *
-          </chakra.a>
-        </Text>
-        <Stack direction={'column'} spacing={3} align={'center'} alignSelf={'center'} position={'relative'}>
-          <Button
-            as={Link}
-            colorScheme={'green'}
-            bg={'green.400'}
-            rounded={'full'}
-            py="8"
-            px="22px"
-            _hover={{
-              bg: 'green.500',
-            }}
-            href="tel:4086179557"
-            title="Call Now"
-            position="relative"
-          >
-            <BsFillTelephoneFill size="20px" />
-          </Button>
-          <Button
-            as={Link}
-            variant={'link'}
-            colorScheme={'blue'}
-            size={'sm'}
-            onClick={() => document.querySelector('#faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-          >
-            Learn more
-          </Button>
-          <Box>
-            <Icon
-              as={Arrow}
-              color={useColorModeValue('gray.800', 'gray.300')}
-              w={71}
-              position={'absolute'}
-              right={-71}
-              top={'10px'}
-            />
-            <Text fontSize={'lg'} position={'absolute'} right={'-125px'} top={'-15px'} transform={'rotate(10deg)'}>
-              (408) 617-9557
+    <>
+      <Stack minH={'100vh'} direction={{ base: 'column', md: 'row' }}>
+        <Flex position={'relative'} p={8} flex={1} align={'center'} justify={'center'}>
+          <Stack spacing={6} w={'full'} maxW={'lg'}>
+            <Heading fontWeight={600} fontSize={{ base: '4xl', md: '6xl' }}>
+              OperatorAI
+              <Badge ml={2} mt={-12} fontSize="0.3em" colorScheme="purple">
+                Alpha
+              </Badge>
+            </Heading>
+            <Text fontSize={{ base: 'md', lg: 'lg' }} color={'gray.500'}>
+              {`OperatorAI system lets callers talk to AI if there are no available 911 operators, grading them on the scale of how important their call is based on the keywords and recording their location. While the responses are being gathered, it will prioritize their call and hand over the call transcript to the 911 operator.`}
             </Text>
-          </Box>
-        </Stack>
-        <Image mt={'20px'} h={'300px'} src="/undraw_active_support.svg" />
+            <Text fontSize={{ base: 'md', lg: 'lg' }} color={'gray.500'}>
+              <em>
+                <small>
+                  Call our OperatorAI Emergency Services
+                  <chakra.a
+                    cursor="pointer"
+                    onClick={() =>
+                      document.querySelector('#faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                    }
+                  >
+                    *
+                  </chakra.a>
+                </small>
+              </em>
+            </Text>
+            <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
+              <Button
+                rounded={'full'}
+                bg={'blue.400'}
+                color={'white'}
+                _hover={{
+                  bg: 'blue.500',
+                }}
+                onClick={() =>
+                  document.querySelector('#dashboard')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+              >
+                Get Started
+              </Button>
+              <Button
+                rounded={'full'}
+                onClick={() => document.querySelector('#faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              >
+                How It Works
+              </Button>
+            </Stack>
+            <Stack
+              position={{ base: 'relative', md: 'absolute' }}
+              mt={{ base: '80px !important', md: 0 }}
+              bottom={5}
+              direction={'column'}
+              spacing={3}
+              align={'center'}
+              alignSelf={'center'}
+            >
+              <Button
+                as={Link}
+                colorScheme={'green'}
+                bg={'green.400'}
+                rounded={'full'}
+                py="8"
+                px="22px"
+                _hover={{
+                  bg: 'green.500',
+                }}
+                href="tel:4086179557"
+                title="Call Now"
+                position="relative"
+              >
+                <BsFillTelephoneFill size="20px" />
+              </Button>
+              <Button
+                as={Link}
+                variant={'link'}
+                colorScheme={'blue'}
+                size={'sm'}
+                onClick={() => document.querySelector('#faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              >
+                Learn more
+              </Button>
+              <Box>
+                <Icon
+                  as={Arrow}
+                  color={useColorModeValue('gray.800', 'gray.300')}
+                  w={71}
+                  position={'absolute'}
+                  right={-71}
+                  top={'10px'}
+                />
+                <Text fontSize={'lg'} position={'absolute'} right={'-125px'} top={'-15px'} transform={'rotate(10deg)'}>
+                  (408) 617-9557
+                </Text>
+              </Box>
+            </Stack>
+          </Stack>
+        </Flex>
+
+        <Flex flex={1}>
+          <Image alt={'Login Image'} objectFit={'cover'} src={'/call_center.jpg'} />
+        </Flex>
       </Stack>
-    </Container>
+    </>
   );
 };
 
