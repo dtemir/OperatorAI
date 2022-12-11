@@ -17,6 +17,7 @@ import {
   Stack,
   Flex,
   Button,
+  Image,
   Link,
 } from '@chakra-ui/react';
 import React from 'react';
@@ -107,8 +108,26 @@ const TableRow: React.FC<TrProps> = ({ data, selected, onClick }) => {
                 >
                   {data.transcript} {data.live ? <span className="blinking-cursor">|</span> : null}
                 </Text>
+                {data.geocode && (
+                  <Image
+                    cursor="pointer"
+                    borderColor="blackAlpha.100"
+                    borderRadius="2xl"
+                    shadow="md"
+                    onClick={() => {
+                      onClick(data);
+                      document.querySelector('#map')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }}
+                    w={'3xl'}
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${data.geocode?.lat},${
+                      data.geocode?.lng
+                    }&zoom=16&size=500x150&maptype=roadmap
+&markers=color:${PRIORITIES[data.priority]?.color}%7C${data.geocode?.lat},${data.geocode?.lng}
+&key=${import.meta.env.VITE_GOOGLE_API_KEY.replace(/\n+/, '').trim()}`}
+                  />
+                )}
               </VStack>
-              <VStack flexGrow={1}>
+              <VStack flexGrow={1} alignSelf={'center'}>
                 <HStack w="sm">
                   <Text textAlign="left" fontWeight="bold" color="gray.600" w={36}>
                     Status
