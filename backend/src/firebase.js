@@ -21,12 +21,12 @@ module.exports.initCallData = (callSid, payload) => {
 
   return set(ref(db, `/calls/${callSid}`), {
     dateCreated: new Date().toISOString(),
-    emergency: 'EMERGENCY',
+    emergency: 'TBD',
     // geocode: undefined,
     // location: undefined,
     live: true,
-    name: payload.CallerName ?? 'Unknown Caller',
-    phone: payload.From ?? 'Unknown Number',
+    name: payload.CallerName || 'Unknown Caller',
+    phone: payload.From || 'Unknown Number',
     priority: 'TBD', // HIGH | MEDIUM | LOW | TBD
     status: 'OPEN', // 'OPEN' | 'DISPATCHED' | 'RESOLVED'
     transcript: '',
@@ -47,16 +47,18 @@ module.exports.updateOnDisconnect = async (callSid) => {
 
   if (snapshot.exists()) {
     const transcript = snapshot.val();
+
+    if (!transcript) {
+      console.warn('Transcript is empty, will not analyze');
+      return;
+    }
+
     console.log('Final transcript: ', transcript);
 
-    const data = (await analyzeTranscript(transcript)) ?? [];
-    const sorted = data.sort(({ score: scoreA }, { score: scoreB }) => scoreB - scoreA);
-
-    const location = sorted.find(({ entity_group }) => ['LOC', 'ORG'].includes(entity_group))?.word;
-    const name = sorted.find(({ entity_group }) => entity_group === 'PER')?.word;
+    const { name, location, emergencyType } = await analyzeTranscript(transcript);
 
     if (location) {
-      console.log('Found location', location);
+      console.log('Found location: ', location);
       updates.location = location;
 
       const coordinates = await getCoordinates(location);
@@ -67,8 +69,13 @@ module.exports.updateOnDisconnect = async (callSid) => {
 
     // override because the caller has announced their name which is more accurate
     if (name) {
-      console.log('Found name', name);
+      console.log('Found name: ', name);
       updates.name = name;
+    }
+
+    if (emergencyType) {
+      console.log('Found emergencyType: ', emergencyType);
+      updates.emergency = emergencyType;
     }
   }
 

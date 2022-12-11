@@ -21,13 +21,59 @@ module.exports.getCoordinates = async (location) => {
   }
 };
 
-module.exports.analyzeTranscript = async (transcript) => {
+const getNamedEntities = async (transcript, options) => {
   try {
-    // Make a POST request to the specified API using axios
-    const response = await axios.post(
-      'https://api-inference.huggingface.co/models/dbmdz/bert-large-cased-finetuned-conll03-english',
+    const { data } = await axios.post(
+      'https://api-inference.huggingface.co/models/Jean-Baptiste/roberta-large-ner-english',
       {
         inputs: transcript,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY2}`,
+        },
+      }
+    );
+
+    if (data?.error) {
+      console.log('ERROR 1', data);
+
+      return {
+        name: undefined,
+        location: undefined,
+      };
+    }
+
+    const namedEntities = (data ?? []).sort(({ score: scoreA }, { score: scoreB }) => scoreB - scoreA);
+    const name = namedEntities.find(({ entity_group }) => entity_group === 'PER')?.word;
+    const location = namedEntities.find(({ entity_group }) => ['LOC', 'ORG'].includes(entity_group))?.word;
+
+    return { name, location };
+  } catch (error) {
+    console.error('Error finding named entities', error);
+
+    return {
+      name: undefined,
+      location: undefined,
+    };
+  }
+};
+
+const getEmergencyType = async (transcript, options) => {
+  try {
+    const { data } = await axios.post(
+      'https://api-inference.huggingface.co/models/facebook/bart-large-mnli',
+      {
+        inputs: transcript,
+        parameters: {
+          candidate_labels: [
+            'medical emergency',
+            'fire emergency',
+            'traffic accident',
+            'crime in progress',
+            'other emergency',
+          ],
+        },
       },
       {
         headers: {
@@ -36,8 +82,36 @@ module.exports.analyzeTranscript = async (transcript) => {
       }
     );
 
-    // Return the response as a JSON object
-    return response.data;
+    if (!data || !data?.labels || !data.labels.length) {
+      console.log('Error finding emergency type', data);
+
+      return {
+        emergencyType: undefined,
+      };
+    }
+
+    return {
+      emergencyType: data.labels[0].replace(/\b[a-z]/gi, (c) => c.toUpperCase()),
+    };
+  } catch (error) {
+    console.error('ERROR HERE', error);
+
+    return {
+      emergencyType: undefined,
+    };
+  }
+};
+
+module.exports.analyzeTranscript = async (transcript) => {
+  try {
+    const { name, location } = await getNamedEntities(transcript);
+    const { emergencyType } = await getEmergencyType(transcript);
+
+    return {
+      name,
+      location,
+      emergencyType,
+    };
   } catch (error) {
     console.error(error);
   }
@@ -52,13 +126,16 @@ module.exports.analyzePriority = (transcript) => {
     'shot',
     'fire',
     'injured',
-    'robbery',
+    'robb',
     'assault',
+    'murder',
     'homicide',
-    'kidnapping',
+    'kidnap',
     'armed',
     'suspect',
     'explosion',
+    'dead',
+    'die',
   ];
   const highPriorityRegex = new RegExp(highPriorityKeywords.join('|'), 'gi');
 
