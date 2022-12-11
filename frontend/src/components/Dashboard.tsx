@@ -119,6 +119,7 @@ export const Dashboard = ({
         ) : null}
       </Box>
       <Box
+        id="map"
         w={'full'}
         h="50vh"
         mb={8}
