@@ -63,6 +63,8 @@ export const Dashboard = ({
       </Box>
     );
 
+  const unresolved = calls.filter((call) => call.status !== STATUSES.RESOLVED.key);
+  const open = calls.filter((call) => call.status === STATUSES.OPEN.key);
   const dispatched = calls.filter((call) => call.status === STATUSES.DISPATCHED.key);
   const resolved = calls.filter((call) => call.status === STATUSES.RESOLVED.key);
 
@@ -84,7 +86,7 @@ export const Dashboard = ({
               active={!status}
               bg="gray.100"
               title={'Unresolved'}
-              stat={calls.length.toString()}
+              stat={unresolved.length.toString()}
               icon={<AiOutlinePhone color="gray" size={'1em'} />}
               onClick={() => setStatus(undefined)}
             />
@@ -92,7 +94,7 @@ export const Dashboard = ({
               active={status === STATUSES.OPEN.key}
               bg="cyan.100"
               title={'Open'}
-              stat={calls.length.toString()}
+              stat={open.length.toString()}
               icon={<AiOutlineFolderOpen color="#00A3C4" size={'1em'} />}
               onClick={() => setStatus(STATUSES.OPEN.key)}
             />
