@@ -41,7 +41,7 @@ export const Dashboard = ({
       <GridItem>
         <Box maxW={{ lg: '3xl' }}>
           <chakra.h1 textAlign={'left'} fontSize={'4xl'} pt={10} fontWeight={'bold'}>
-            AssembyAI Hackathon
+            AssemblyAI Hackathon
           </chakra.h1>
           {error ? <Text>Error: {error.message}</Text> : null}
           <SimpleGrid py="8" columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
@@ -87,7 +87,7 @@ export const Dashboard = ({
                 lng: -122.465668,
               }
             }
-            zoom={selectedRow?.geocode ? 18 : 10}
+            zoom={selectedRow?.geocode ? 18 : 12}
           >
             {filteredCalls.map((call) => {
               if (call.status === STATUSES.RESOLVED.key) return null;
