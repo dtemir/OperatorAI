@@ -41,10 +41,10 @@ export const StatusIndicator = ({ active }: StatusIndicatorProps) => {
 	`;
 
   return (
-    <Flex justifyContent="center" alignItems="center" h="24px" w="full" flexDir="column" overflow="hidden">
+    <Flex justifyContent="center" alignItems="center" h="24px" w="full" flexDir="column">
       {/* Ideally, only the box should be used. The <Flex /> is used to style the preview. */}
       {active ? (
-        <Tooltip label={`Status: Active`} textTransform="capitalize">
+        <Tooltip label={`Live Call`} textTransform="capitalize">
           <Box
             as="div"
             h="12px"
