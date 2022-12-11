@@ -1,4 +1,4 @@
-import { SimpleGrid, Text, chakra, Box, Flex, Badge } from '@chakra-ui/react';
+import { SimpleGrid, Text, chakra, Box, Flex, Badge, VStack } from '@chakra-ui/react';
 
 import { AiOutlinePhone, AiOutlineClockCircle } from 'react-icons/ai';
 import { useState } from 'react';
@@ -37,8 +37,8 @@ export const Dashboard = ({
     tableView === STATUSES.DISPATCHED.key ? dispatched : tableView === STATUSES.RESOLVED.key ? resolved : calls;
 
   return (
-    <Flex p={8} w={'75vw'} h={'100vh'} mx={'auto'} flexDirection="column" gap={8}>
-      <Box maxH="50vh">
+    <VStack p={8} w={'75vw'} minH={'100vh'} mx={'auto'} gap={8}>
+      <Box w={'full'} maxH="50vh">
         <Box>
           <chakra.h1 textAlign={'left'} fontSize={'4xl'} pt={10} fontWeight={'bold'}>
             OperatorAI
@@ -79,6 +79,7 @@ export const Dashboard = ({
         ) : null}
       </Box>
       <Box
+        w={'full'}
         flex={1}
         rounded={'2xl'}
         bg="white"
@@ -116,6 +117,6 @@ export const Dashboard = ({
           </Map>
         </Wrapper>
       </Box>
-    </Flex>
+    </VStack>
   );
 };
