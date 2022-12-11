@@ -17,7 +17,9 @@ export const StatsCard = (props: StatsCardProps) => {
       py={'4'}
       rounded={'2xl'}
       bg="white"
-      shadow={active ? 'xl' : 'md'}
+      borderWidth={'2px'}
+      borderColor={active ? 'blackAlpha.400' : 'transparent'}
+      shadow={active ? '2xl' : 'md'}
       {...rest}
     >
       <Flex justifyContent={'space-between'}>

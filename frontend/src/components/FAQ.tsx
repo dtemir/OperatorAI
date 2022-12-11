@@ -30,10 +30,14 @@ export function FAQ() {
       q: `Can the OperatorAI system provide medical advice or assistance?`,
       a: `No, the OperatorAI system is not designed to provide medical advice or assistance. Its primary purpose is to gather information about the emergency situation and prioritize the call for a 911 operator. It is not a substitute for professional medical care.`,
     },
+    {
+      q: `* For testing purposes only. Please call official 911 Emergency Services if you are in danger.`,
+      a: 'OperatorAI is a proof of concept project and is not intended to replace real emergency services.',
+    },
   ];
 
   return (
-    <Box>
+    <Box id="faq">
       <Heading as="h2" size="md" mb={4}>
         Frequently Asked Questions
       </Heading>
