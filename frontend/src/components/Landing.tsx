@@ -9,22 +9,33 @@ import {
   useColorModeValue,
   createIcon,
   Badge,
+  Link,
+  Image,
+  chakra,
 } from '@chakra-ui/react';
 import { BsFillTelephoneFill } from 'react-icons/bs';
 
 export const Landing = () => {
   return (
     <Container maxW={'3xl'}>
-      <Stack as={Box} textAlign={'center'} spacing={{ base: 8, md: 14 }} py={{ base: 16, md: 24 }}>
+      <Stack as={Box} textAlign={'center'} spacing={{ base: 8, md: 14 }} pt={{ base: 16, md: 24 }} pb={{ base: 10 }}>
         <Heading fontWeight={600} fontSize={{ base: '4xl', md: '6xl' }}>
           OperatorAI
           <Badge ml={2} mt={-12} fontSize="0.3em" colorScheme="purple">
             Alpha
           </Badge>
         </Heading>
-        <Text color={'gray.500'}>Call our OperatorAI Emergency Services*</Text>
+        <Text color={'gray.500'}>
+          Call our OperatorAI Emergency Services
+          <chakra.a
+            onClick={() => document.querySelector('#faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          >
+            *
+          </chakra.a>
+        </Text>
         <Stack direction={'column'} spacing={3} align={'center'} alignSelf={'center'} position={'relative'}>
           <Button
+            as={Link}
             colorScheme={'green'}
             bg={'green.400'}
             rounded={'full'}
@@ -33,10 +44,19 @@ export const Landing = () => {
             _hover={{
               bg: 'green.500',
             }}
+            href="tel:4086179557"
+            title="Call Now"
+            position="relative"
           >
             <BsFillTelephoneFill size="20px" />
           </Button>
-          <Button variant={'link'} colorScheme={'blue'} size={'sm'}>
+          <Button
+            as={Link}
+            variant={'link'}
+            colorScheme={'blue'}
+            size={'sm'}
+            onClick={() => document.querySelector('#faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          >
             Learn more
           </Button>
           <Box>
@@ -48,18 +68,12 @@ export const Landing = () => {
               right={-71}
               top={'10px'}
             />
-            <Text
-              fontSize={'lg'}
-              fontFamily={'Caveat'}
-              position={'absolute'}
-              right={'-125px'}
-              top={'-15px'}
-              transform={'rotate(10deg)'}
-            >
-              +1 (408) 617-9557
+            <Text fontSize={'lg'} position={'absolute'} right={'-125px'} top={'-15px'} transform={'rotate(10deg)'}>
+              (408) 617-9557
             </Text>
           </Box>
         </Stack>
+        <Image mt={'20px'} h={'300px'} src="/undraw_active_support.svg" />
       </Stack>
     </Container>
   );

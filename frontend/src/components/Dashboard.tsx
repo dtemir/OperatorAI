@@ -1,4 +1,4 @@
-import { SimpleGrid, Text, Box, Skeleton, Flex } from '@chakra-ui/react';
+import { SimpleGrid, Text, chakra, Box, Skeleton, Flex, Badge } from '@chakra-ui/react';
 
 import { AiOutlinePhone, AiOutlineClockCircle, AiOutlineFolderOpen } from 'react-icons/ai';
 import { useState } from 'react';
@@ -20,7 +20,7 @@ const filterCallsBasedOnStatus = (calls: CallData[], status: keyof typeof STATUS
     case STATUSES.RESOLVED.key:
       return calls.filter((call) => call.status === STATUSES.RESOLVED.key);
     default:
-      return calls;
+      return calls.filter((call) => call.status !== STATUSES.RESOLVED.key);
   }
 };
 
@@ -72,12 +72,18 @@ export const Dashboard = ({
     <Box p={{ md: 8 }} w={{ md: '75vw' }} minH={'100vh'} mx={'auto'}>
       <Box w={'full'} mb={8}>
         <Box>
+          <chakra.h1 textAlign={'left'} fontSize={'4xl'} pt={10} fontWeight={'bold'}>
+            OperatorAI
+            <Badge ml={2} mt={-5} fontSize="0.4em" colorScheme="purple">
+              Alpha
+            </Badge>
+          </chakra.h1>
           {error ? <Text>Error: {error.message}</Text> : null}
           <SimpleGrid py="8" columns={{ base: 1, lg: 4 }} spacing={{ base: 5, lg: 8 }}>
             <StatsCard
               active={!status}
               bg="gray.100"
-              title={'Calls'}
+              title={'Unresolved'}
               stat={calls.length.toString()}
               icon={<AiOutlinePhone color="gray" size={'1em'} />}
               onClick={() => setStatus(undefined)}
