@@ -54,12 +54,6 @@ export const Dashboard = ({
     <Box p={{ md: 8 }} w={{ md: '75vw' }} minH={'100vh'} mx={'auto'}>
       <Box w={'full'} mb={8}>
         <Box>
-          <chakra.h1 textAlign={'left'} fontSize={'4xl'} pt={10} fontWeight={'bold'}>
-            OperatorAI
-            <Badge ml={2} mt={-5} fontSize="0.4em" colorScheme="purple">
-              Alpha
-            </Badge>
-          </chakra.h1>
           {error ? <Text>Error: {error.message}</Text> : null}
           <SimpleGrid py="8" columns={{ base: 1, md: 4 }} spacing={{ base: 5, lg: 8 }}>
             <StatsCard

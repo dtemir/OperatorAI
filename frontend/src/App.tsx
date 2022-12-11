@@ -26,7 +26,8 @@ function App() {
 
   return (
     <Container bg="gray.50" minH="100vh" maxW="10xl" mx="0" pr={{ base: '4', lg: '0' }}>
-      <Landing />]{loading ? <Spinner size="xl" /> : null}
+      <Landing />
+      {loading ? <Spinner size="xl" /> : null}
       {calls ? <Dashboard calls={calls} loading={loading} error={error} /> : null}
       <Footer />
     </Container>
