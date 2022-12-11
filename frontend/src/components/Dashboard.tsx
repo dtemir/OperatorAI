@@ -1,4 +1,4 @@
-import { SimpleGrid, Text, chakra, Box, Grid, GridItem } from '@chakra-ui/react';
+import { SimpleGrid, Text, chakra, Box, Flex, Badge } from '@chakra-ui/react';
 
 import { AiOutlinePhone, AiOutlineClockCircle } from 'react-icons/ai';
 import { useState } from 'react';
@@ -37,11 +37,14 @@ export const Dashboard = ({
     tableView === STATUSES.DISPATCHED.key ? dispatched : tableView === STATUSES.RESOLVED.key ? resolved : calls;
 
   return (
-    <Grid templateColumns={{ base: 'repeat(1, 100%)', lg: 'repeat(2, 1fr)' }} gap={8}>
-      <GridItem>
-        <Box maxW={{ lg: '3xl' }}>
+    <Flex p={8} w={'75vw'} h={'100vh'} mx={'auto'} flexDirection="column" gap={8}>
+      <Box maxH="50vh">
+        <Box>
           <chakra.h1 textAlign={'left'} fontSize={'4xl'} pt={10} fontWeight={'bold'}>
-            AssemblyAI Hackathon
+            OperatorAI
+            <Badge ml={2} mt={-5} fontSize="0.4em" colorScheme="purple">
+              Alpha
+            </Badge>
           </chakra.h1>
           {error ? <Text>Error: {error.message}</Text> : null}
           <SimpleGrid py="8" columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
@@ -74,8 +77,16 @@ export const Dashboard = ({
         {!loading && filteredCalls ? (
           <CallsTable selectedRowKey={selectedRow?.key} onRowClick={handleClick} calls={filteredCalls} />
         ) : null}
-      </GridItem>
-      <GridItem overflow="hidden" minH={{ base: '20rem', lg: 'unset' }}>
+      </Box>
+      <Box
+        flex={1}
+        rounded={'2xl'}
+        bg="white"
+        shadow={'xl'}
+        overflow={'hidden'}
+        border="1px solid"
+        borderColor="blackAlpha.200"
+      >
         <Wrapper apiKey={import.meta.env.VITE_GOOGLE_API_KEY} render={render}>
           <Map
             style={{
@@ -104,7 +115,7 @@ export const Dashboard = ({
             })}
           </Map>
         </Wrapper>
-      </GridItem>
-    </Grid>
+      </Box>
+    </Flex>
   );
 };
