@@ -11,6 +11,7 @@ import {
   Thead,
   Tr,
   useDisclosure,
+  VStack,
 } from '@chakra-ui/react';
 import React from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
@@ -70,7 +71,23 @@ const TableRow: React.FC<TrProps> = ({ data, selected, onClick }) => {
       <Tr display={isOpen ? 'contents' : 'none'}>
         <Td colSpan={headers.length} bg="white">
           <Collapse in={isOpen} animateOpacity>
-            <Text as="cite">{data.transcript}</Text>
+            <VStack maxW="2xl" alignItems="left" m="2">
+              <Text textAlign="left" fontWeight="bold" color="gray.600">
+                Transcript:
+              </Text>
+              <Text
+                whiteSpace="pre-wrap"
+                border="1px solid"
+                fontStyle="italic"
+                borderColor="blackAlpha.100"
+                borderRadius="2xl"
+                shadow="md"
+                m="3"
+                p="3"
+              >
+                {data.transcript} {data.live ? <span className="blinking-cursor">|</span> : null}
+              </Text>
+            </VStack>
           </Collapse>
         </Td>
       </Tr>

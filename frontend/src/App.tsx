@@ -1,4 +1,4 @@
-import { Container, Spinner } from '@chakra-ui/react';
+import { Container, Spinner, Text } from '@chakra-ui/react';
 import { ref } from 'firebase/database';
 import { useListVals } from 'react-firebase-hooks/database';
 
@@ -9,6 +9,8 @@ import { CallData } from './types/calls';
 import { Dashboard } from './components/Dashboard';
 import { Landing } from './components/Landing';
 import { Footer } from './components/Footer';
+
+import './index.css';
 
 export interface MapCoordinates {
   name: string;
@@ -24,8 +26,7 @@ function App() {
 
   return (
     <Container bg="gray.50" minH="100vh" maxW="10xl" mx="0" pr={{ base: '4', lg: '0' }}>
-      <Landing />
-      {loading ? <Spinner size="xl" /> : null}
+      <Landing />]{loading ? <Spinner size="xl" /> : null}
       {calls ? <Dashboard calls={calls} loading={loading} error={error} /> : null}
       <Footer />
     </Container>
