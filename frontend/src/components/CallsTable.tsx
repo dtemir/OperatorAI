@@ -89,7 +89,6 @@ const CallsTable: React.FC<{
     <TableContainer
       display="flex"
       maxH="70vh"
-      maxW={{ base: 'full', lg: 'xl', xl: '3xl', '2xl': 'unset' }}
       overflowY="auto"
       border="1px solid"
       borderRadius="2xl"
