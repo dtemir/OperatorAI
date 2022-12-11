@@ -52,7 +52,7 @@ module.exports.updateOnDisconnect = async (callSid) => {
     const data = (await analyzeTranscript(transcript)) ?? [];
     const sorted = data.sort(({ score: scoreA }, { score: scoreB }) => scoreB - scoreA);
 
-    const location = sorted.find(({ entity_group }) => entity_group === 'LOC')?.word;
+    const location = sorted.find(({ entity_group }) => ['LOC', 'ORG'].includes(entity_group))?.word;
     const name = sorted.find(({ entity_group }) => entity_group === 'PER')?.word;
 
     if (location) {
@@ -75,12 +75,14 @@ module.exports.updateOnDisconnect = async (callSid) => {
   return update(ref(db, `/calls/${callSid}`), updates);
 };
 
-module.exports.updateTranscript = (callSid, transcript, priority) => {
+module.exports.updateTranscript = (callSid, streamSid, transcript, priority) => {
   if (!callSid) {
     return;
   }
 
   return update(ref(db, `/calls/${callSid}`), {
+    callSid,
+    streamSid,
     transcript,
     priority,
   });

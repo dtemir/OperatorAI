@@ -49,6 +49,7 @@ module.exports.analyzePriority = (transcript) => {
     'shots',
     'kill',
     'gun',
+    'shot',
     'fire',
     'injured',
     'robbery',

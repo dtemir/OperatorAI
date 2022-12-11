@@ -55,7 +55,7 @@ wss.on('connection', (ws) => {
           }
 
           const priority = analyzePriority(transcript);
-          updateTranscript(callSid, transcript, priority);
+          updateTranscript(callSid, msg.streamSid, transcript, priority);
         };
         break;
 

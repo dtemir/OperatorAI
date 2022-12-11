@@ -29,15 +29,17 @@ export interface Geocode {
 
 export type CallData = {
   key: string;
+  callSid: string;
+  streamSid: string;
   name: string;
   emergency: string;
-  location: string;
+  location?: string;
+  geocode?: Geocode;
   phone: string;
   priority: PrioritesKeys;
   live: boolean;
   status: StatusesKeys;
   transcript?: string;
-  geocode: Geocode;
   dateCreated: string;
-  dateDisconnected: string;
+  dateDisconnected?: string;
 };
