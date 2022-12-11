@@ -9,6 +9,7 @@ import { StatsCard } from './StatsCard';
 import { Map } from './Maps/Map';
 import { Marker } from './Maps/Marker';
 import CallsTable from './CallsTable';
+import { FAQ } from './FAQ';
 
 export const Dashboard = ({
   calls,
@@ -37,7 +38,7 @@ export const Dashboard = ({
     tableView === STATUSES.DISPATCHED.key ? dispatched : tableView === STATUSES.RESOLVED.key ? resolved : calls;
 
   return (
-    <Box p={8} w={'75vw'} minH={'100vh'} mx={'auto'}>
+    <Box p={{ md: 8 }} w={{ md: '75vw' }} minH={'100vh'} mx={'auto'}>
       <Box w={'full'} mb={8}>
         <Box>
           <chakra.h1 textAlign={'left'} fontSize={'4xl'} pt={10} fontWeight={'bold'}>
@@ -81,6 +82,7 @@ export const Dashboard = ({
       <Box
         w={'full'}
         h="50vh"
+        mb={8}
         rounded={'2xl'}
         bg="white"
         shadow={'xl'}
@@ -117,6 +119,7 @@ export const Dashboard = ({
           </Map>
         </Wrapper>
       </Box>
+      <FAQ />
     </Box>
   );
 };

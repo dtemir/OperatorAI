@@ -53,7 +53,9 @@ const TableRow: React.FC<TrProps> = ({ data, selected, onClick }) => {
           <Badge colorScheme={PRIORITIES?.[data.priority]?.color}>{data.priority}</Badge>
         </Td>
         <Td>
-          <strong>{data.name}</strong><br /><em>{formattedPhone}</em>
+          <strong>{data.name}</strong>
+          <br />
+          <em>{formattedPhone}</em>
         </Td>
         <Td>{data.emergency}</Td>
         <Td>{new Date(data.dateCreated).toLocaleTimeString()}</Td>
