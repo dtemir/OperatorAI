@@ -14,17 +14,19 @@ const wss = new WebSocket.Server({ server });
 const { initCallData, updateTranscript, updateOnDisconnect } = require('./src/firebase');
 const { analyzePriority } = require('./src/utils');
 
-let assembly;
 let chunks = [];
 let callerMap = {}; //[msg.streamSid] = msg.callSid;
+let assemblyAIWSMap = {}; //[msg.callSid]: assemblyAIWSConnection
 
 wss.on('connection', (ws) => {
   console.info('New Connection Initiated');
 
   ws.on('message', async (message) => {
-    if (!assembly) return console.error("AssemblyAI's WebSocket must be initialized.");
-
     const msg = JSON.parse(message);
+    const callSid = msg.start?.callSid ?? callerMap[msg.streamSid];
+
+    const assembly = assemblyAIWSMap[callSid]
+    // if (!assembly) return console.error("AssemblyAI's WebSocket must be initialized.");
 
     switch (msg.event) {
       case 'connected':
@@ -37,11 +39,8 @@ wss.on('connection', (ws) => {
 
         callerMap[msg.streamSid] = msg.start.callSid;
 
-        const callSid = msg.start.callSid ?? callerMap[msg.streamSid];
-
         const texts = {};
 
-        assembly.onerror = console.error;
         assembly.onmessage = (assemblyMsg) => {
           let transcript = '';
           const res = JSON.parse(assemblyMsg.data);
@@ -101,7 +100,10 @@ wss.on('connection', (ws) => {
         console.info('Call has ended');
         assembly.send(JSON.stringify({ terminate_session: true }));
         updateOnDisconnect(callerMap[msg.streamSid]);
-        setTimeout(() => assembly.close(), 100); // time?
+        setTimeout(() => {
+          assembly.close()
+          delete assemblyAIWSMap[callSid]
+        }, 100); // time?
         break;
     }
   });
@@ -114,9 +116,10 @@ app.post('/', async (req, res) => {
 
   console.log('Webhook received');
 
-  assembly = new WebSocket('wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000', {
+  assemblyAIWSMap[callSid] = new WebSocket('wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000', {
     headers: { authorization: process.env.ASSEMBLYAI_API_KEY },
   });
+  assemblyAIWSMap[callSid].onerror = console.error;
 
   initCallData(callSid, req.body);
 
@@ -146,11 +149,14 @@ server.listen(8080, () => console.log('Listening on Port 8080'));
 
 const exitHandler = (exitCode = 0) =>
   function () {
-    console.log('Gracefully terminating assemblyai connection');
-    if (assembly) {
-      assembly.close();
-    }
+    console.log('Gracefully terminating assemblyai connection', arguments);
 
+    for (const assembly of Object.values(assemblyAIWSMap)){
+      if (assembly) {
+        assembly.send(JSON.stringify({ terminate_session: true }));
+        assembly.close();
+      }
+    }
     process.exit(exitCode);
   };
 
