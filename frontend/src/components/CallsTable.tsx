@@ -18,7 +18,7 @@ import { CallData, PRIORITIES, STATUSES } from '../types/calls';
 import { Info } from './Info';
 import { StatusIndicator } from './StatusIndicator';
 
-const headers = ['Live', 'Priority', 'Who', 'What', 'When', 'Where', 'Status', ''];
+const headers = ['Live', 'Priority', 'Caller', 'Emergency', 'Time', 'Location', 'Status', ''];
 
 interface TrProps {
   selected: boolean;
@@ -31,6 +31,11 @@ const TableRow: React.FC<TrProps> = ({ data, selected, onClick }) => {
     defaultIsOpen: data.live,
   });
 
+  const regex = /(\d{3})(\d{3})(\d{4})$/;
+  const [, firstGroup, secondGroup, thirdGroup] = regex.exec(data.phone) ?? [];
+
+  const formattedPhone = `(${firstGroup}) ${secondGroup}-${thirdGroup}`;
+
   return (
     <>
       <Tr
@@ -41,15 +46,14 @@ const TableRow: React.FC<TrProps> = ({ data, selected, onClick }) => {
         bg={selected ? 'blue.50' : 'white'}
         onClick={() => onClick(data)}
       >
-        <Td>
-          {' '}
+        <Td w={3}>
           <StatusIndicator active={data.live} />{' '}
         </Td>
         <Td>
           <Badge colorScheme={PRIORITIES?.[data.priority]?.color}>{data.priority}</Badge>
         </Td>
         <Td>
-          {data.name} <br />({data.phone})
+          <strong>{data.name}</strong><br /><em>{formattedPhone}</em>
         </Td>
         <Td>{data.emergency}</Td>
         <Td>{new Date(data.dateCreated).toLocaleTimeString()}</Td>

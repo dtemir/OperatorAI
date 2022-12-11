@@ -25,8 +25,8 @@ module.exports.initCallData = (callSid, payload) => {
     // geocode: undefined,
     // location: undefined,
     live: true,
-    name: payload.CallerName ?? 'UNKNOWN CALLER',
-    phone: payload.From ?? 'UNKNOWN NUMBER',
+    name: payload.CallerName ?? 'Unknown Caller',
+    phone: payload.From ?? 'Unknown Number',
     priority: 'TBD', // HIGH | MEDIUM | LOW | TBD
     status: 'OPEN', // 'OPEN' | 'DISPATCHED' | 'RESOLVED'
     transcript: '',
