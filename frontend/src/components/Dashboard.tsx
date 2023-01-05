@@ -68,7 +68,20 @@ export const Dashboard = ({
   const dispatched = calls.filter((call) => call.status === STATUSES.DISPATCHED.key);
   const resolved = calls.filter((call) => call.status === STATUSES.RESOLVED.key);
 
-  const filteredCalls = filterCallsBasedOnStatus(calls, status);
+  const filterCallsBasedOnStatus = (status: keyof typeof STATUSES | undefined) => {
+    switch (status) {
+      case STATUSES.OPEN.key:
+        return open;
+      case STATUSES.DISPATCHED.key:
+        return dispatched;
+      case STATUSES.RESOLVED.key:
+        return resolved;
+      default:
+        return unresolved;
+    }
+  };
+
+  const filteredCalls = filterCallsBasedOnStatus(status);
 
   return (
     <Box id="dashboard" p={{ md: 8 }} w={{ md: '75vw' }} minH={'100vh'} mx={'auto'}>
