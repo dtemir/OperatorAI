@@ -1,14 +1,18 @@
 ![OperatorAI](assets/OperatorAI-Header.png)
 
-# OperatorAI
+# 🏆 Winner
+
+OperatorAI won third place in the [AssmeblyAI Winter Hackathon](https://hackathon.assemblyai.com/). Find our demo on [Devpost](https://devpost.com/software/draft-w86vkc).
+
+# 🚨 OperatorAI
 
 Did you know many 911 call centers are understaffed? During the last hurricane in Florida, thousands of 911 callers were faced with no services. Also, the latest report showed 60 percent of callers in the US cannot be located by emergency dispatchers because of outdated technologies.
 
 OperatorAI is a revolutionary new AI system that helps triage 911 calls and connect callers with emergency services. With OperatorAI, you can trust that your call will be handled quickly and efficiently, even during times of high call volume or natural disasters. Thanks to its advanced technology, OperatorAI can also accurately locate callers, ensuring that help arrives as quickly as possible. So when you need help in an emergency, trust OperatorAI to help you get the assistance you need.
 
-# Technologies
+# 🤖 Technologies
 
-Here is a digram explainig how OperatorAI works! Our solution relies on several APIs and WebSocket connections to provide **real-time** solutions for any emergency.
+Here is a diagram explaining how OperatorAI works! Our solution relies on several APIs and WebSocket connections to provide **real-time** solutions for any emergency.
 
 ![Operator AI Diagram showing Twilio, AssemblyAI integration, etc.](/assets/OperatorAI-Diagram.svg)
 
@@ -16,13 +20,13 @@ Here is a digram explainig how OperatorAI works! Our solution relies on several 
 
 ### 🧠 AssemblyAI
 
-We used AssemblyAI [Real-Time Transcription](https://www.assemblyai.com/docs/walkthroughs#realtime-streaming-transcription) for our project because it is a highly accurate and reliable transcription service that is able to quickly and accurately transcribe spoken words into text. This is important for our project because it allows us to quickly and accurately understand the content of incoming 911 calls, which is crucial for prioritizing calls based on their severity. 
+We used AssemblyAI [Real-Time Transcription](https://www.assemblyai.com/docs/walkthroughs#realtime-streaming-transcription) for our project because it is a highly accurate and reliable transcription service that can quickly and accurately transcribe spoken words into text. This is important for our project because it allows us to quickly and accurately understand the content of incoming 911 calls, which is crucial for prioritizing calls based on their severity.
 
 Additionally, the real-time aspect of the transcription service allows us to quickly and efficiently send transcripts to available operators, further improving the ability to provide timely emergency response. Overall, AssemblyAI Real-Time Transcription was the perfect fit for our project because it allows us to quickly and accurately process incoming 911 calls.
 
 ### ☎️ Twilio
 
-Using Twilio's [Programmable Voice API](https://www.twilio.com/docs/voice), we were able to seamlessly accept and handle calls from callers. Twilio's powerful and intuitive REST API webhook and websockets made it easy for us to quickly respond to callers and provide them with the assistance they needed. This saved us from the time-consuming and complex process of building and maintaining our own infrastructure. 
+Using Twilio's [Programmable Voice API](https://www.twilio.com/docs/voice), we were able to seamlessly accept and handle calls from callers. Twilio's powerful and intuitive REST API webhook and WebSockets made it easy for us to quickly respond to callers and provide them with the assistance they needed. This saved us from the time-consuming and complex process of building and maintaining our infrastructure.
 
 Twilio's caller id feature was incredibly useful for 911 operators, allowing them to quickly and easily identify who they were speaking to and provide more personalized and effective assistance. Overall, Twilio's platform proved to be a valuable asset for our hackathon project, providing us with the tools and capabilities we needed to quickly and easily handle calls from callers.
 
@@ -47,19 +51,19 @@ Firebase Realtime Database was easy to set up and use, which allowed us to quick
 
 ## Front-End
 
-### ⚡Vite & React 
+### ⚡ Vite & React 
 
 We used [Vite](https://vitejs.dev/) and React for our hackathon project because they both enable fast and efficient development of modern frontend applications. Together, Vite and React provided us with a powerful and flexible development environment that allowed us to quickly and easily create a user-friendly frontend for our app. 
 
-Vite and React are both widely adopted and have a large and active community of developers, which made it easier for us to find support and resources as we worked on our project. Overall, Vite and React were a great choice for our hackathon project because of their speed, efficiency, and flexibility.
+Vite and React are both widely adopted and have a large and active community of developers, which made it easier for us to find support and resources as we worked on our project. Overall, Vite and React were great choices for our hackathon project because of their speed, efficiency, and flexibility.
 
-### 🎨Chakra-UI
+### 🎨 Chakra-UI
 
 After careful consideration, we ultimately decided to use [Chakra UI](https://chakra-ui.com/) for our hackathon project. We were drawn to this popular React component library because of its simplicity, modularity, and accessibility. Chakra UI is designed to be highly customizable and easy to use, and it follows the design paradigm of TailwindCSS, which is known for its simplicity and flexibility. 
 
 Chakra UI comes with a set of fully typed and extendable components that allow for rapid development, which was crucial for a hackathon project with a tight timeline. Overall, we were impressed by the capabilities and features of Chakra UI, and we are happy that it helped us build a high-quality and accessible application for our hackathon project.
 
-### 🧑‍💻Git & GitHub
+### 🧑‍💻 Git & GitHub
 
 To ensure that our hackathon project was well-organized and collaborative, we made use of Git and [GitHub](https://github.com/dtemir?tab=repositories) best practices, as well as Visual Studio Code Live Share, throughout the development process. We used Git to manage our codebase and track changes, and we used GitHub to host our repository and facilitate collaboration.
 
@@ -89,6 +93,6 @@ I am Liam. I am at 350 DNA Way, and there is a party going above my apartment fo
 
 Hey, my name is Noah. I am at 600 Carmel Ave, and I heard a gunshot close to me, but I do not know the direction. I am safe in my house, but I think someone got hurt or might get hurt if you do not rush. Please come fast!
 
-## Car accident
+## Car Accident
 
-Hey, I am Lucas, I am at home at 501 4th Ave  and I was just getting out of my garage and someone just crashed into me. I am very concerned. I have my child with me. She looks fine but it is hard to check because my legs are stuck and I cannot move. I do not know if I am bleeding or not. Can you please come as soon as possible?
+Hey, I am Lucas, I am at home at 501 4th Ave and I was just getting out of my garage and someone just crashed into me. I am very concerned. I have my child with me. She looks fine but it is hard to check because my legs are stuck and I cannot move. I do not know if I am bleeding or not. Can you please come as soon as possible?
